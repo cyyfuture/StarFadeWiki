@@ -18,6 +18,14 @@ import StarfieldBackground from '@/components/StarfieldBackground';
 
 import { MOCK_SHIPS, type IShip } from '@/data/ships';
 
+const TYPE_ORDER = ['小型', '中型', '大型', '旗舰'] as const;
+const TYPE_ANCHORS: Record<string, string> = {
+  '小型': 'ships-small',
+  '中型': 'ships-medium',
+  '大型': 'ships-large',
+  '旗舰': 'ships-flagship',
+};
+
 export default function WikiHomePage() {
   // --- 筛选/排序/搜索状态 ---
   const [shipFilter, setShipFilter] = useState<ShipFilterState>({
@@ -63,17 +71,14 @@ export default function WikiHomePage() {
   const filteredShips = useMemo(() => {
     let result = [...MOCK_SHIPS];
 
-    // 类型筛选
     if (shipFilter.types.length > 0) {
       const types = new Set(shipFilter.types);
       result = result.filter((s) => types.has(s.type));
     }
-    // 定位筛选
     if (shipFilter.roles.length > 0) {
       const roles = new Set(shipFilter.roles);
       result = result.filter((s) => roles.has(s.role));
     }
-    // 搜索
     if (shipFilter.keyword.trim()) {
       const kw = shipFilter.keyword.trim().toLowerCase();
       result = result.filter(
@@ -84,7 +89,6 @@ export default function WikiHomePage() {
       );
     }
 
-    // 排序
     const numA = (v: number | string) => (typeof v === 'number' ? v : 0);
     result.sort((a, b) => {
       switch (shipFilter.sortBy) {
@@ -111,6 +115,21 @@ export default function WikiHomePage() {
 
     return result;
   }, [shipFilter]);
+
+  // --- 舰船分组（按类型 + 锚点） ---
+  const shipGroups = useMemo(() => {
+    if (shipFilter.types.length > 0) {
+      return [{ type: '', label: '', anchor: '', ships: filteredShips }];
+    }
+    return TYPE_ORDER
+      .filter((t) => filteredShips.some((s) => s.type === t))
+      .map((t) => ({
+        type: t,
+        label: t,
+        anchor: TYPE_ANCHORS[t],
+        ships: filteredShips.filter((s) => s.type === t),
+      }));
+  }, [filteredShips, shipFilter.types]);
 
   // --- 对比操作 ---
   const toggleShipSelection = useCallback((id: string) => {
@@ -146,7 +165,6 @@ export default function WikiHomePage() {
     setSelectedShipIds(new Set());
   }, []);
 
-  // --- 搜索联动：从Header搜索跳转过来 ---
   const handleSearchFromHeader = useCallback((keyword: string) => {
     setShipFilter((prev) => ({ ...prev, keyword }));
     const shipsSection = document.getElementById('ships');
@@ -155,27 +173,47 @@ export default function WikiHomePage() {
     }
   }, []);
 
+  const renderShipGrid = (ships: IShip[]) => (
+    <motion.div
+      layout
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+    >
+      {ships.map((ship, i) => (
+        <motion.div
+          key={ship.id}
+          layout
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4, delay: (i % 8) * 0.03 }}
+        >
+          <ShipCard
+            ship={ship}
+            selected={selectedShipIds.has(ship.id)}
+            onToggleSelect={() => toggleShipSelection(ship.id)}
+            onClickDetail={() => setDetailShip(ship)}
+          />
+        </motion.div>
+      ))}
+    </motion.div>
+  );
+
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-hidden">
-      {/* 星空背景 */}
       <StarfieldBackground />
 
-      {/* Header */}
       <Header
         theme={theme}
         onToggleTheme={toggleTheme}
         onSearch={handleSearchFromHeader}
       />
 
-      {/* 主体: 侧边栏 + 内容 */}
       <div className="flex">
-        {/* 桌面端侧边栏 */}
         <AppSidebar
           collapsed={sidebarCollapsed}
           onToggle={() => setSidebarCollapsed((v) => !v)}
         />
 
-        {/* 主内容区 */}
         <main
           className={`flex-1 min-w-0 transition-all duration-300 ${
             sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'
@@ -208,35 +246,34 @@ export default function WikiHomePage() {
                 </p>
               </motion.div>
 
-              {/* 筛选工具栏 */}
-              <ShipFilterBar
-                onFilterChange={setShipFilter}
-              />
+              <ShipFilterBar onFilterChange={setShipFilter} />
 
-              {/* 舰船卡片网格 */}
+              {/* 舰船卡片（按类型分组） */}
               {filteredShips.length > 0 ? (
-                <motion.div
-                  layout
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-                >
-                  {filteredShips.map((ship, i) => (
-                    <motion.div
-                      key={ship.id}
-                      layout
-                      initial={{ opacity: 0, y: 16 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.4, delay: (i % 8) * 0.03 }}
-                    >
-                      <ShipCard
-                        ship={ship}
-                        selected={selectedShipIds.has(ship.id)}
-                        onToggleSelect={() => toggleShipSelection(ship.id)}
-                        onClickDetail={() => setDetailShip(ship)}
-                      />
-                    </motion.div>
+                <div className="mt-6 space-y-10">
+                  {shipGroups.map((group, gi) => (
+                    <div key={group.type || 'all'}>
+                      {group.type && (
+                        <motion.div
+                          id={group.anchor}
+                          initial={{ opacity: 0, x: -12 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ duration: 0.4 }}
+                          className="flex items-center gap-3 mb-4 pb-2 border-b border-border/30"
+                        >
+                          <span className="text-lg font-semibold text-foreground/90">
+                            {group.type}舰船
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {group.ships.length} 种
+                          </span>
+                        </motion.div>
+                      )}
+                      {renderShipGrid(group.ships)}
+                    </div>
                   ))}
-                </motion.div>
+                </div>
               ) : (
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -317,12 +354,10 @@ export default function WikiHomePage() {
             </div>
           </section>
 
-          {/* Footer */}
           <Footer />
         </main>
       </div>
 
-      {/* 舰船详情弹窗 */}
       <ShipDetailModal
         ship={detailShip}
         open={!!detailShip}
@@ -331,7 +366,6 @@ export default function WikiHomePage() {
         }}
       />
 
-      {/* 对比弹窗 */}
       <CompareModal
         ships={selectedShips}
         open={compareOpen}
