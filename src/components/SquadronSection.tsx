@@ -19,16 +19,17 @@ const ROLE_ICONS: Record<string, typeof Zap> = {
   '防空制空': Shield,
   '全域制空': Crosshair,
   '反小型舰': Crosshair,
-  '反大船': Zap,
-  '破护盾': Zap,
-  '功能辅助': Wrench,
-  '特种作战': Crosshair,
+  '穿甲反大船': Zap,
+  '护盾穿透反旗舰': Zap,
+  '功能辅助致盲': Wrench,
+  '特种作战夺舰': Crosshair,
 };
 
 const MAINTENANCE_LABELS: Record<number, string> = {
   1: '前线补给站',
   2: '标准行星星港',
   3: '大型轨道船坞',
+  4: '巨型旗舰船坞',
 };
 
 function getRoleIcon(role: string) {

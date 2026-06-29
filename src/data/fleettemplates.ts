@@ -21,7 +21,7 @@ export const MOCK_FLEET_TEMPLATES: IFleetTemplate[] = [
       { shipName: '补给舰', count: 2 },
       { shipName: '轻巡洋舰', count: 3 }
     ],
-    tacticDescription: '以私掠船为核心威慑力量，低成本维持存在舰队，适合和平发展期',
+    tacticDescription: '低成本堆外交威慑，邻国不敢宣战，适合种田发育流',
     imageUrl: '/fleet-deterrence.png'
   },
   {
@@ -39,7 +39,7 @@ export const MOCK_FLEET_TEMPLATES: IFleetTemplate[] = [
       { shipName: '补给舰', count: 2 },
       { shipName: '工程战斗舰', count: 2 }
     ],
-    tacticDescription: '攻防兼备的通用编队，兼顾输出、护航与续航，适合中烈度冲突',
+    tacticDescription: '兼顾威慑与实战，应对绝大多数NPC冲突，适合通用跑团剧情',
     imageUrl: '/fleet-balanced.png'
   },
   {
@@ -59,7 +59,7 @@ export const MOCK_FLEET_TEMPLATES: IFleetTemplate[] = [
       { shipName: '补给舰', count: 3 },
       { shipName: '工程战斗舰', count: 3 }
     ],
-    tacticDescription: '终局决战配置，全域战力倍增体系完整，适合决定性的舰队会战',
+    tacticDescription: '纯实战精锐，短期决战爆发力拉满，容易被多国联盟宣战，仅适合短期决战',
     imageUrl: '/fleet-elite.png'
   }
 ]
