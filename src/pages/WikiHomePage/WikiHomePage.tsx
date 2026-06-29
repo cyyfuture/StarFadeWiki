@@ -248,6 +248,30 @@ export default function WikiHomePage() {
 
               <ShipFilterBar onFilterChange={setShipFilter} />
 
+              {/* 类型快捷导航 */}
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+                className="mt-5 flex flex-wrap items-center gap-2"
+              >
+                <span className="text-xs text-muted-foreground mr-1">快速跳转:</span>
+                {TYPE_ORDER.map((t) => {
+                  const count = MOCK_SHIPS.filter((s) => s.type === t).length;
+                  return (
+                    <a
+                      key={t}
+                      href={`#${TYPE_ANCHORS[t]}`}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border/40 text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-primary/5 transition-all duration-200"
+                    >
+                      {t}舰
+                      <span className="text-[10px] opacity-60">({count})</span>
+                    </a>
+                  );
+                })}
+              </motion.div>
+
               {/* 舰船卡片（按类型分组） */}
               {filteredShips.length > 0 ? (
                 <div className="mt-6 space-y-10">
