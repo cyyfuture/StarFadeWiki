@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Swords, Scale, Wrench, ChevronDown, ChevronUp } from 'lucide-react';
+import { Shield, Swords, Scale, Wrench, ChevronDown, ChevronUp, FileText, Download } from 'lucide-react';
 import { Image } from '@/components/ui/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -50,6 +50,23 @@ export default function RulesSection({ id }: RulesSectionProps) {
           <p className="mt-3 text-muted-foreground text-sm md:text-base max-w-2xl mx-auto">
             核心战斗机制速查——指挥上限、威慑判定、克制倍率、维护等级
           </p>
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="mt-5 flex justify-center"
+          >
+            <a
+              href="/rulebook.pdf"
+              download
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary/10 border border-primary/25 text-primary hover:bg-primary/20 hover:border-primary/40 transition-all duration-300 text-sm font-medium"
+            >
+              <FileText className="size-4" />
+              下载完整规则书 PDF
+              <Download className="size-3.5" />
+            </a>
+          </motion.div>
         </motion.div>
 
         {/* 规则卡片网格 */}

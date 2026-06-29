@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronRight, Menu, X } from 'lucide-react';
+import { ChevronDown, ChevronRight, Menu, X, FileText, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -231,7 +231,16 @@ export default function AppSidebar() {
 
       {/* Footer */}
       {!collapsed && (
-        <div className="px-3 py-3 border-t border-border/40">
+        <div className="px-3 py-3 border-t border-border/40 space-y-2">
+          <a
+            href="/rulebook.pdf"
+            download
+            className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all duration-200"
+          >
+            <FileText className="size-3.5" />
+            <span>完整规则书 PDF</span>
+            <Download className="size-3 ml-auto" />
+          </a>
           <p className="text-[10px] text-muted-foreground/60 text-center leading-relaxed">
             星海舰队 Wiki · v1.0
           </p>
