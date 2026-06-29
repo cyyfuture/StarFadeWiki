@@ -47,8 +47,19 @@ fi
 # 清理中间产物
 rm -rf "$ROOT/dist/client"
 
+# 6. 合并到 dist/output/（Cloudflare Pages 单目录部署）
+if [ -d "$OUTPUT_RESOURCE" ]; then
+  cp -r "$OUTPUT_RESOURCE/." "$OUTPUT/"
+  rm -rf "$OUTPUT_RESOURCE"
+fi
+if [ -d "$OUTPUT_STATIC" ]; then
+  cp -r "$OUTPUT_STATIC/." "$OUTPUT/"
+  rm -rf "$OUTPUT_STATIC"
+fi
+if [ -d "$ROOT/dist/output_capabilities" ]; then
+  cp -r "$ROOT/dist/output_capabilities/." "$OUTPUT/"
+  rm -rf "$ROOT/dist/output_capabilities"
+fi
+
 echo "Build complete"
-echo "  HTML         → dist/output/"
-[ -d "$OUTPUT_RESOURCE" ] && echo "  Resource     → dist/output_resource/" || true
-[ -d "$OUTPUT_STATIC" ] && echo "  Static       → dist/output_static/" || true
-[ -d "$ROOT/dist/output_capabilities" ] && echo "  Capabilities → dist/output_capabilities/" || true
+echo "  All output → dist/output/"
