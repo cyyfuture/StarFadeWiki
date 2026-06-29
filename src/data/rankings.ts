@@ -18,7 +18,7 @@ export const MOCK_RANKINGS: IRankingCategory[] = [
     id: '1',
     category: '存在舰队威慑效率',
     description: '衡量舰船在非战时通过存在感震慑敌方的能力',
-    imageUrl: '/spark/app/app_17956t6ms3q/runtime/api/v1/storage/object/bucket_aadkikkacngew_static/static%2Faadkikddk5qsu_ve_miaoda',
+    imageUrl: '/squadron-hunter.png',
     items: [
       { rank: 1, shipName: '私掠船', efficiencyValue: 100 },
       { rank: 2, shipName: '导弹巡游舰', efficiencyValue: 88 },
@@ -31,7 +31,7 @@ export const MOCK_RANKINGS: IRankingCategory[] = [
     id: '2',
     category: '战场打击力效率',
     description: '衡量舰船在实战中输出伤害的效率表现',
-    imageUrl: '/spark/app/app_17956t6ms3q/runtime/api/v1/storage/object/bucket_aadkikkacngew_static/static%2Faadkikddk5qsu_ve_miaoda',
+    imageUrl: '/squadron-hunter.png',
     items: [
       { rank: 1, shipName: '导弹巡游舰', efficiencyValue: 100 },
       { rank: 2, shipName: '进攻舰', efficiencyValue: 85 },
@@ -44,7 +44,7 @@ export const MOCK_RANKINGS: IRankingCategory[] = [
     id: '3',
     category: '长期运营性价比',
     description: '综合考虑造价、维护与战力的长期投入产出比',
-    imageUrl: '/spark/app/app_17956t6ms3q/runtime/api/v1/storage/object/bucket_aadkikkacngew_static/static%2Faadkikddk5qsu_ve_miaoda',
+    imageUrl: '/squadron-hunter.png',
     items: [
       { rank: 1, shipName: '导弹巡游舰', efficiencyValue: 100 },
       { rank: 2, shipName: '私掠船', efficiencyValue: 92 },

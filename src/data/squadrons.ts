@@ -23,7 +23,7 @@ export const MOCK_SQUADRONS: ISquadron[] = [
     role: '防空制空',
     counterRelation: '克制敌方战机，被反舰攻击中队克制',
     maintenanceLevel: 2,
-    imageUrl: '/spark/app/app_17956t6ms3q/runtime/api/v1/storage/object/bucket_aadkikkacngew_static/static%2Faadkijxruuucw_ve_miaoda'
+    imageUrl: '/squadron-hunter.png'
   },
   {
     id: '2',
@@ -35,7 +35,7 @@ export const MOCK_SQUADRONS: ISquadron[] = [
     role: '全域制空',
     counterRelation: '降低敌方战机输出30%，均衡空战单位',
     maintenanceLevel: 2,
-    imageUrl: '/spark/app/app_17956t6ms3q/runtime/api/v1/storage/object/bucket_aadkikkacngew_static/static%2Faadkijxruuucw_ve_miaoda'
+    imageUrl: '/squadron-hunter.png'
   },
   {
     id: '3',
@@ -47,6 +47,6 @@ export const MOCK_SQUADRONS: ISquadron[] = [
     role: '反小型舰',
     counterRelation: '克制私掠船、轻巡、驱逐舰，被拦截中队克制',
     maintenanceLevel: 2,
-    imageUrl: '/spark/app/app_17956t6ms3q/runtime/api/v1/storage/object/bucket_aadkikkacngew_static/static%2Faadkikcgcmkcu_ve_miaoda'
+    imageUrl: '/squadron-hound.png'
   }
 ]

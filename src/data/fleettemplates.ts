@@ -22,7 +22,7 @@ export const MOCK_FLEET_TEMPLATES: IFleetTemplate[] = [
       { shipName: '轻巡洋舰', count: 3 }
     ],
     tacticDescription: '以私掠船为核心威慑力量，低成本维持存在舰队，适合和平发展期',
-    imageUrl: '/spark/app/app_17956t6ms3q/runtime/api/v1/storage/object/bucket_aadkikkacngew_static/static%2Faadkikianhqbw_ve_miaoda'
+    imageUrl: '/fleet-deterrence.png'
   },
   {
     id: '2',
@@ -40,7 +40,7 @@ export const MOCK_FLEET_TEMPLATES: IFleetTemplate[] = [
       { shipName: '工程战斗舰', count: 2 }
     ],
     tacticDescription: '攻防兼备的通用编队，兼顾输出、护航与续航，适合中烈度冲突',
-    imageUrl: '/spark/app/app_17956t6ms3q/runtime/api/v1/storage/object/bucket_aadkikkacngew_static/static%2Faadkij5g55knw_ve_miaoda'
+    imageUrl: '/fleet-balanced.png'
   },
   {
     id: '3',
@@ -60,6 +60,6 @@ export const MOCK_FLEET_TEMPLATES: IFleetTemplate[] = [
       { shipName: '工程战斗舰', count: 3 }
     ],
     tacticDescription: '终局决战配置，全域战力倍增体系完整，适合决定性的舰队会战',
-    imageUrl: '/spark/app/app_17956t6ms3q/runtime/api/v1/storage/object/bucket_aadkikkacngew_static/static%2Faadkijxruuubw_ve_miaoda'
+    imageUrl: '/fleet-elite.png'
   }
 ]
