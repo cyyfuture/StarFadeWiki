@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronRight, Menu, X, FileText, Download } from 'lucide-react';
@@ -163,8 +163,23 @@ function NavItem({ section, activeAnchor, depth = 0, collapsed, onNavigate }: Na
   );
 }
 
-export default function AppSidebar() {
-  const [collapsed, setCollapsed] = useState(false);
+interface AppSidebarProps {
+  collapsed?: boolean;
+  onToggle?: () => void;
+}
+
+export default function AppSidebar({ collapsed: extCollapsed, onToggle: extOnToggle }: AppSidebarProps = {}) {
+  const [internalCollapsed, setInternalCollapsed] = useState(false);
+  const collapsed = extCollapsed ?? internalCollapsed;
+
+  const handleToggle = useCallback(() => {
+    if (extOnToggle) {
+      extOnToggle();
+    } else {
+      setInternalCollapsed(prev => !prev);
+    }
+  }, [extOnToggle]);
+
   const [mobileOpen, setMobileOpen] = useState(false);
   const activeAnchor = useActiveAnchor();
   const sidebarRef = useRef<HTMLElement>(null);
@@ -209,7 +224,7 @@ export default function AppSidebar() {
           variant="ghost"
           size="icon"
           className="size-8 shrink-0 text-muted-foreground hover:text-foreground"
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={handleToggle}
           aria-label={collapsed ? '展开侧边栏' : '折叠侧边栏'}
         >
           <ChevronRight className={cn('size-4 transition-transform duration-300', !collapsed && 'rotate-180')} />

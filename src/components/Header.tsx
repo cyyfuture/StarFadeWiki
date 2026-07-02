@@ -16,35 +16,51 @@ const NAV_ITEMS = [
   { label: '效率排名', anchor: '#rankings' },
 ] as const;
 
-export default function Header() {
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+interface HeaderProps {
+  theme?: 'dark' | 'light';
+  onToggleTheme?: () => void;
+  onSearch?: (keyword: string) => void;
+}
+
+export default function Header({ theme: extTheme, onToggleTheme: extToggleTheme, onSearch: extOnSearch }: HeaderProps = {}) {
+  const [internalTheme, setInternalTheme] = useState<'dark' | 'light'>('dark');
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  // 使用外部受控 props，无 props 时内部 fallback
+  const theme = extTheme ?? internalTheme;
+
   useEffect(() => {
+    if (extTheme !== undefined) return; // 受控模式，不自行初始化
     const stored = scopedStorage.getItem('__wiki_theme');
     if (stored === 'light' || stored === 'dark') {
-      setTheme(stored);
+      setInternalTheme(stored);
       document.documentElement.classList.toggle('dark', stored === 'dark');
     } else {
       document.documentElement.classList.add('dark');
     }
-  }, []);
+  }, [extTheme]);
 
   const toggleTheme = useCallback(() => {
-    setTheme((prev) => {
-      const next = prev === 'dark' ? 'light' : 'dark';
-      scopedStorage.setItem('__wiki_theme', next);
-      document.documentElement.classList.toggle('dark', next === 'dark');
-      return next;
-    });
-  }, []);
+    if (extToggleTheme) {
+      extToggleTheme();
+    } else {
+      setInternalTheme((prev) => {
+        const next = prev === 'dark' ? 'light' : 'dark';
+        scopedStorage.setItem('__wiki_theme', next);
+        document.documentElement.classList.toggle('dark', next === 'dark');
+        return next;
+      });
+    }
+  }, [extToggleTheme]);
 
   const handleSearchSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
       if (!searchKeyword.trim()) return;
+      // 通知外部搜索回调
+      extOnSearch?.(searchKeyword.trim());
       setSearchOpen(false);
       setSearchKeyword('');
       const shipsSection = document.getElementById('ships');
@@ -52,7 +68,7 @@ export default function Header() {
         shipsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     },
-    [searchKeyword],
+    [searchKeyword, extOnSearch],
   );
 
   const handleNavClick = useCallback(() => {
