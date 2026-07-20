@@ -87,6 +87,73 @@
   --spacing: 0.25rem;
 }
 
+.light {
+  --button-outline: rgba(0,0,0,.12);
+  --badge-outline: rgba(0,0,0,.06);
+
+  --elevate-1: rgba(0,0,0,.04);
+  --elevate-2: rgba(0,0,0,.08);
+
+  --background: hsl(220 20% 97%);
+  --foreground: hsl(230 20% 15%);
+  --card: hsl(220 20% 100%);
+  --card-foreground: hsl(230 20% 15%);
+  --popover: hsl(220 20% 100%);
+  --popover-foreground: hsl(230 20% 15%);
+  --primary: hsl(190 90% 35%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(40 80% 45%);
+  --secondary-foreground: hsl(0 0% 100%);
+  --muted: hsl(220 15% 90%);
+  --muted-foreground: hsl(220 10% 45%);
+  --accent: hsl(40 80% 45%);
+  --accent-foreground: hsl(0 0% 100%);
+  --info: hsl(221 83% 45%);
+  --info-foreground: hsl(0 0% 100%);
+  --destructive: hsl(0 72% 51%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --success: hsl(142 71% 35%);
+  --success-foreground: hsl(0 0% 100%);
+  --warning: hsl(26 90% 42%);
+  --warning-foreground: hsl(0 0% 100%);
+  --border: hsl(220 15% 85%);
+  --input: hsl(220 15% 85%);
+  --ring: hsl(190 90% 35%);
+  --chart-1: hsl(190 90% 35%);
+  --chart-2: hsl(217 80% 45%);
+  --chart-3: hsl(247 80% 45%);
+  --chart-4: hsl(277 80% 45%);
+  --chart-5: hsl(307 80% 45%);
+  --sidebar: hsl(220 20% 97%);
+  --sidebar-foreground: hsl(230 20% 15%);
+  --sidebar-primary: hsl(190 90% 35%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(220 15% 88%);
+  --sidebar-accent-foreground: hsl(190 90% 35%);
+  --sidebar-border: hsl(220 15% 80%);
+  --sidebar-ring: hsl(190 90% 35%);
+
+  --shadow-x: 0px;
+  --shadow-y: 1px;
+  --shadow-blur: 8px;
+  --shadow-spread: 0px;
+  --shadow-opacity: 0.05;
+  --shadow-color: #000000;
+  --shadow-2xs: 0px 1px 8px 0px hsl(0 0% 0% / 0.03);
+  --shadow-xs: 0px 1px 8px 0px hsl(0 0% 0% / 0.03);
+  --shadow-sm:
+    0px 1px 8px 0px hsl(0 0% 0% / 0.05), 0px 1px 2px -1px hsl(0 0% 0% / 0.05);
+  --shadow:
+    0px 1px 8px 0px hsl(0 0% 0% / 0.05), 0px 1px 2px -1px hsl(0 0% 0% / 0.05);
+  --shadow-md:
+    0px 1px 8px 0px hsl(0 0% 0% / 0.05), 0px 2px 4px -1px hsl(0 0% 0% / 0.05);
+  --shadow-lg:
+    0px 1px 8px 0px hsl(0 0% 0% / 0.05), 0px 4px 6px -1px hsl(0 0% 0% / 0.05);
+  --shadow-xl:
+    0px 1px 8px 0px hsl(0 0% 0% / 0.05), 0px 8px 10px -1px hsl(0 0% 0% / 0.05);
+  --shadow-2xl: 0px 1px 8px 0px hsl(0 0% 0% / 0.08);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

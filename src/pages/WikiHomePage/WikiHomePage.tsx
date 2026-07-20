@@ -1,7 +1,8 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
+import { useTheme } from '@/hooks/use-theme';
 import Header from '@/components/Header';
 import AppSidebar from '@/components/AppSidebar';
 import Footer from '@/components/Footer';
@@ -13,6 +14,7 @@ import CompareModal from '@/components/CompareModal';
 import SquadronSection from '@/components/SquadronSection';
 import RulesSection from '@/components/RulesSection';
 import TemplatesSection from '@/components/TemplatesSection';
+import FleetHeatmapSection from '@/components/FleetHeatmapSection';
 import RankingsSection from '@/components/RankingsSection';
 import StarfieldBackground from '@/components/StarfieldBackground';
 
@@ -46,26 +48,7 @@ export default function WikiHomePage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // --- 主题 ---
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
-
-  useEffect(() => {
-    const stored = localStorage.getItem('__wiki_theme');
-    if (stored === 'light' || stored === 'dark') {
-      setTheme(stored);
-      document.documentElement.classList.toggle('dark', stored === 'dark');
-    } else {
-      document.documentElement.classList.add('dark');
-    }
-  }, []);
-
-  const toggleTheme = useCallback(() => {
-    setTheme((prev) => {
-      const next = prev === 'dark' ? 'light' : 'dark';
-      localStorage.setItem('__wiki_theme', next);
-      document.documentElement.classList.toggle('dark', next === 'dark');
-      return next;
-    });
-  }, []);
+  const { theme, toggle: toggleTheme } = useTheme();
 
   // --- 筛选 + 排序 + 搜索 ---
   const filteredShips = useMemo(() => {
@@ -199,7 +182,7 @@ export default function WikiHomePage() {
   );
 
   return (
-    <div className="relative min-h-screen bg-background text-foreground overflow-hidden">
+    <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
       <StarfieldBackground />
 
       <Header
@@ -216,7 +199,7 @@ export default function WikiHomePage() {
 
         <main
           className={`flex-1 min-w-0 transition-all duration-300 ${
-            sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'
+            sidebarCollapsed ? 'xl:ml-16' : 'xl:ml-60'
           }`}
         >
           {/* Hero */}
@@ -235,7 +218,11 @@ export default function WikiHomePage() {
                 className="mb-8"
               >
                 <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
-                  <span className="text-primary">◆</span>{' '}
+                  <motion.span
+                    className="text-primary inline-block"
+                    animate={{ opacity: [1, 0.6, 1], textShadow: ['0 0 8px rgba(0,229,255,0.4)', '0 0 16px rgba(0,229,255,0.6)', '0 0 8px rgba(0,229,255,0.4)'] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                  >◆</motion.span>{' '}
                   全舰种数据总表
                   <span className="ml-2 text-sm font-normal text-muted-foreground">
                     {MOCK_SHIPS.length} 种舰船
@@ -260,14 +247,16 @@ export default function WikiHomePage() {
                 {TYPE_ORDER.map((t) => {
                   const count = MOCK_SHIPS.filter((s) => s.type === t).length;
                   return (
-                    <a
+                    <motion.a
                       key={t}
                       href={`#${TYPE_ANCHORS[t]}`}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border/40 text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-primary/5 transition-all duration-200"
+                      whileHover={{ scale: 1.05, y: -1 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border/40 text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-primary/5 transition-colors duration-200"
                     >
                       {t}舰
                       <span className="text-[10px] opacity-60">({count})</span>
-                    </a>
+                    </motion.a>
                   );
                 })}
               </motion.div>
@@ -370,6 +359,9 @@ export default function WikiHomePage() {
               <TemplatesSection />
             </div>
           </section>
+
+          {/* 配队热力图 */}
+          <FleetHeatmapSection />
 
           {/* 效率梯队排名 */}
           <section id="rankings" className="w-full py-12 md:py-16">

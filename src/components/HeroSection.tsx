@@ -88,7 +88,7 @@ export default function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative w-full overflow-hidden bg-[rgb(10_12_28)] py-24 md:py-36"
+      className="relative w-full overflow-hidden bg-background py-24 md:py-36"
     >
       {/* 星空粒子背景 */}
       <StarfieldCanvas />
@@ -106,7 +106,7 @@ export default function HeroSection() {
 
       {/* 顶部光晕 */}
       <div
-        className="pointer-events-none absolute left-1/2 top-0 z-[1] h-[400px] w-[800px] -translate-x-1/2 rounded-full bg-[rgb(0_200_255_/_0.06)] blur-[120px]"
+        className="pointer-events-none absolute left-1/2 top-0 z-[1] h-[400px] w-[800px] -translate-x-1/2 rounded-full bg-primary/5 blur-[120px]"
         aria-hidden="true"
       />
 
@@ -130,7 +130,7 @@ export default function HeroSection() {
             星海舰队桌游
             <br />
             <span
-              className="bg-gradient-to-r from-[rgb(0_220_255)] via-[rgb(100_200_255)] to-[rgb(255_200_80)] bg-clip-text text-transparent"
+              className="bg-gradient-to-r from-primary via-blue-300 to-accent bg-clip-text text-transparent"
               style={{
                 filter: 'drop-shadow(0 0 18px rgba(0,200,255,0.55))',
               }}
@@ -144,16 +144,16 @@ export default function HeroSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-5 text-base tracking-[0.15em] text-[rgb(140_190_220)] md:text-lg"
+            className="mt-5 text-base tracking-[0.15em] text-muted-foreground md:text-lg"
           >
             36种舰船 + 7种舰载机 + 完整跑团规则
           </motion.p>
 
           {/* 装饰分割线 */}
           <div className="mx-auto mt-8 flex items-center justify-center gap-3">
-            <div className="h-px w-16 bg-gradient-to-r from-transparent to-[rgb(0_200_255_/_0.5)]" />
-            <div className="size-2 rotate-45 border border-[rgb(0_200_255_/_0.5)]" />
-            <div className="h-px w-16 bg-gradient-to-l from-transparent to-[rgb(0_200_255_/_0.5)]" />
+            <div className="h-px w-16 bg-gradient-to-r from-transparent to-primary/50" />
+            <div className="size-2 rotate-45 border border-primary/50" />
+            <div className="h-px w-16 bg-gradient-to-l from-transparent to-primary/50" />
           </div>
         </motion.div>
 
@@ -184,15 +184,15 @@ export default function HeroSection() {
                   borderColor: 'rgba(0,200,255,0.5)',
                   transition: { duration: 0.2 },
                 }}
-                className="group flex flex-col items-center gap-3 rounded-xl border border-[rgb(0_200_255_/_0.12)] bg-[rgb(15_18_38_/_0.75)] px-4 py-6 backdrop-blur-sm"
+                className="group flex flex-col items-center gap-3 rounded-xl border border-primary/15 bg-card/75 px-4 py-6 backdrop-blur-sm"
               >
-                <div className="flex size-12 items-center justify-center rounded-lg bg-[rgb(0_200_255_/_0.08)] transition-colors group-hover:bg-[rgb(0_200_255_/_0.16)]">
-                  <Icon className="size-6 text-[rgb(0_200_255)]" />
+                <div className="flex size-12 items-center justify-center rounded-lg bg-primary/10 transition-colors group-hover:bg-primary/20">
+                  <Icon className="size-6 text-primary" />
                 </div>
-                <span className="text-center text-xs font-medium tracking-wider text-[rgb(120_170_210)] md:text-sm">
+                <span className="text-center text-xs font-medium tracking-wider text-muted-foreground md:text-sm">
                   {m.label}
                 </span>
-                <span className="text-lg font-bold tracking-[0.1em] text-[rgb(0_220_255)] md:text-xl">
+                <span className="text-lg font-bold tracking-[0.1em] text-primary md:text-xl">
                   {m.value}
                 </span>
               </motion.div>
@@ -201,7 +201,7 @@ export default function HeroSection() {
         </motion.div>
 
         {/* 底部扫描线 */}
-        <div className="mx-auto mt-14 h-px w-full max-w-2xl bg-gradient-to-r from-transparent via-[rgb(0_200_255_/_0.3)] to-transparent" />
+        <div className="mx-auto mt-14 h-px w-full max-w-2xl bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
       </div>
     </section>
   );

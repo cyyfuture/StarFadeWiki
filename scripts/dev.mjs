@@ -62,7 +62,7 @@ function startProcess({ name, command, args, logFileName }) {
 
   const child = spawn(command, args, {
     stdio: ['ignore', 'pipe', 'pipe'],
-    shell: false,
+    shell: process.platform === 'win32',
     cwd: ROOT,
     env: process.env,
     detached: true,

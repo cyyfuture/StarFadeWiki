@@ -1,4 +1,4 @@
-import { useState, useCallback, type FormEvent } from 'react';
+import { useState, useCallback, useEffect, useRef, type FormEvent } from 'react';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -41,6 +41,7 @@ export default function ShipFilterBar({ onFilterChange }: ShipFilterBarProps) {
   const [roles, setRoles] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState('cost-asc');
   const [keyword, setKeyword] = useState('');
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const emit = useCallback(
     (overrides: Partial<ShipFilterState>) => {
@@ -49,6 +50,15 @@ export default function ShipFilterBar({ onFilterChange }: ShipFilterBarProps) {
     },
     [types, roles, sortBy, keyword, onFilterChange],
   );
+
+  // Debounced keyword emission
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      emit({ keyword });
+    }, 300);
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  }, [keyword]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleType = (t: string) => {
     const next = types.includes(t) ? types.filter((v) => v !== t) : [...types, t];
@@ -67,9 +77,8 @@ export default function ShipFilterBar({ onFilterChange }: ShipFilterBarProps) {
     emit({ sortBy: v });
   };
 
-  const handleSearch = (e: FormEvent) => {
-    e.preventDefault();
-    emit({ keyword });
+  const handleKeywordChange = (value: string) => {
+    setKeyword(value);
   };
 
   const clearAll = () => {
@@ -84,15 +93,15 @@ export default function ShipFilterBar({ onFilterChange }: ShipFilterBarProps) {
 
   return (
     <div className="w-full space-y-4">
-      {/* 搜索栏 */}
-      <form onSubmit={handleSearch} className="flex gap-3">
+      {/* 搜索栏 — 实时过滤 */}
+      <div className="flex gap-3">
         <div className="relative flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
             value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            placeholder="搜索舰种名称..."
+            onChange={(e) => handleKeywordChange(e.target.value)}
+            placeholder="实时搜索舰种名称..."
             className="bg-card pl-9 pr-9 border-border/60 focus-visible:ring-primary/50"
           />
           {keyword && (
@@ -111,10 +120,7 @@ export default function ShipFilterBar({ onFilterChange }: ShipFilterBarProps) {
             </Button>
           )}
         </div>
-        <Button type="submit" variant="secondary" size="sm" className="shrink-0">
-          搜索
-        </Button>
-      </form>
+      </div>
 
       {/* 筛选控件行 */}
       <div className="flex flex-wrap items-center gap-3">

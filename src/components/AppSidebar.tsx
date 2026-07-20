@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronRight, Menu, X, FileText, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -26,6 +26,7 @@ const NAV_SECTIONS: NavSection[] = [
   { label: '舰载机中队', anchor: '#squadrons' },
   { label: '跑团战斗规则', anchor: '#rules' },
   { label: '标准配队模板', anchor: '#templates' },
+  { label: '配队热力图', anchor: '#fleet-heatmap' },
   { label: '效率梯队排名', anchor: '#rankings' },
 ];
 
@@ -79,20 +80,23 @@ function NavItem({ section, activeAnchor, depth = 0, collapsed, onNavigate }: Na
   if (collapsed) {
     return (
       <div className="relative flex justify-center py-1">
-        <NavLink
-          to={section.anchor}
-          onClick={onNavigate}
-          className={({ isActive: linkActive }) =>
-            cn(
+        <a
+          href={section.anchor}
+          onClick={(e) => {
+            e.preventDefault();
+            const el = document.getElementById(section.anchor.replace('#', ''));
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            onNavigate?.();
+          }}
+          className={cn(
               'flex items-center justify-center size-9 rounded-lg transition-colors duration-200',
-              linkActive || isActive
+              isActive
                 ? 'bg-primary/15 text-primary'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
-            )
-          }
+            )}
         >
           <div className="size-1.5 rounded-full bg-current" />
-        </NavLink>
+        </a>
       </div>
     );
   }
@@ -100,18 +104,21 @@ function NavItem({ section, activeAnchor, depth = 0, collapsed, onNavigate }: Na
   return (
     <div>
       <div className="flex items-center">
-        <NavLink
-          to={section.anchor}
-          onClick={onNavigate}
-          className={({ isActive: linkActive }) =>
-            cn(
-              'flex-1 flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-200',
-              linkActive || isActive
+        <a
+          href={section.anchor}
+          onClick={(e) => {
+            e.preventDefault();
+            const el = document.getElementById(section.anchor.replace('#', ''));
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            onNavigate?.();
+          }}
+          className={cn(
+              'flex-1 flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-200 cursor-pointer',
+              isActive
                 ? 'bg-primary/10 text-primary font-semibold shadow-[inset_0_0_0_1px_rgba(0_229_255_0.25)]'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted/40',
               depth > 0 && 'pl-8 text-xs',
-            )
-          }
+            )}
         >
           {depth === 0 && (
             <span
@@ -122,7 +129,7 @@ function NavItem({ section, activeAnchor, depth = 0, collapsed, onNavigate }: Na
             />
           )}
           <span className="truncate">{section.label}</span>
-        </NavLink>
+        </a>
         {hasChildren && (
           <Button
             variant="ghost"
@@ -247,6 +254,7 @@ export default function AppSidebar({ collapsed: extCollapsed, onToggle: extOnTog
       {/* Footer */}
       {!collapsed && (
         <div className="px-3 py-3 border-t border-border/40 space-y-2">
+          {/* eslint-disable-next-line no-restricted-syntax */}
           <a
             href="/rulebook.pdf"
             download
@@ -311,7 +319,7 @@ export default function AppSidebar({ collapsed: extCollapsed, onToggle: extOnTog
       <aside
         ref={sidebarRef}
         className={cn(
-          'hidden lg:flex flex-col fixed top-16 left-0 h-[calc(100vh-4rem)] bg-card/80 backdrop-blur-xl border-r border-border/40 z-30 transition-all duration-300',
+          'hidden xl:flex flex-col fixed top-16 left-0 h-[calc(100vh-4rem)] bg-card/80 backdrop-blur-xl border-r border-border/40 z-30 transition-all duration-300',
           collapsed ? 'w-14' : 'w-56',
         )}
       >

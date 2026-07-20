@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Zap, Shield, Crosshair, Wrench, ChevronDown, ChevronUp } from 'lucide-react';
-import { Image } from '@/components/ui/image';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -58,10 +57,13 @@ function SquadronCard({ squadron, index }: { squadron: ISquadron; index: number 
             <div className="flex items-center gap-3 min-w-0">
               <div className="relative size-12 shrink-0 rounded-lg overflow-hidden border border-border/50 bg-muted/30">
                 {squadron.imageUrl ? (
-                  <Image
+                  <img
                     src={squadron.imageUrl}
                     alt={squadron.name}
                     className="size-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
                   />
                 ) : (
                   <div className="flex items-center justify-center size-full text-muted-foreground">
@@ -316,10 +318,13 @@ export default function SquadronSection() {
                         <TableCell className="font-medium text-sm whitespace-nowrap">
                           <div className="flex items-center gap-2">
                             {sq.imageUrl ? (
-                              <Image
+                              <img
                                 src={sq.imageUrl}
                                 alt={sq.name}
                                 className="size-7 rounded object-cover shrink-0 border border-border/30"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).style.display = 'none';
+                                }}
                               />
                             ) : (
                               <div className="size-7 rounded bg-muted/30 flex items-center justify-center shrink-0">

@@ -4,3 +4,10 @@
 @import "tw-animate-css";
 @import "./tailwind-theme.css";
 @import "./typography.css";
+
+@layer base {
+  h1 { @apply text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight; }
+  h2 { @apply text-2xl md:text-3xl font-bold tracking-tight; }
+  h3 { @apply text-lg md:text-xl font-semibold; }
+  p  { @apply text-sm md:text-base leading-relaxed; }
+}

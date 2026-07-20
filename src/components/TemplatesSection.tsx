@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Swords, Zap, ChevronRight, Anchor } from 'lucide-react';
-import { Image } from '@/components/ui/image';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MOCK_FLEET_TEMPLATES, type IFleetTemplate } from '@/data/fleettemplates';
@@ -95,10 +94,13 @@ export default function TemplatesSection() {
 
                   {/* Template Image */}
                   <div className="relative h-48 overflow-hidden">
-                    <Image
+                    <img
                       src={template.imageUrl}
                       alt={template.name}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
                     {/* Cost Badge */}

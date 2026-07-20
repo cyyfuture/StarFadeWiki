@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Trophy, Zap, TrendingUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Trophy, Zap, TrendingUp, BarChart3, Radar } from 'lucide-react';
+import ReactECharts from 'echarts-for-react';
 import { MOCK_RANKINGS, type IRankingCategory } from '@/data/rankings';
 
 const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -27,6 +28,49 @@ function RankingCard({ category }: { category: IRankingCategory }) {
   const Icon = CATEGORY_ICONS[category.category] || Trophy;
   const colors = CATEGORY_COLORS[category.category] || { bar: 'bg-primary', glow: 'shadow-primary/40' };
   const maxValue = category.items[0]?.efficiencyValue ?? 100;
+  const [viewMode, setViewMode] = useState<'list' | 'radar'>('list');
+
+  const radarOption = {
+    radar: {
+      indicator: category.items.map((item) => ({
+        name: item.shipName,
+        max: maxValue,
+      })),
+      center: ['50%', '55%'],
+      radius: '70%',
+      axisName: {
+        color: '#888',
+        fontSize: 10,
+      },
+      splitArea: {
+        areaStyle: {
+          color: ['rgba(0,229,255,0.02)', 'rgba(0,229,255,0.04)'],
+        },
+      },
+      splitLine: {
+        lineStyle: { color: 'rgba(0,229,255,0.2)' },
+      },
+      axisLine: {
+        lineStyle: { color: 'rgba(0,229,255,0.3)' },
+      },
+    },
+    series: [
+      {
+        type: 'radar',
+        data: [
+          {
+            value: category.items.map((item) => item.efficiencyValue),
+            name: category.category,
+            areaStyle: { color: 'rgba(0,229,255,0.15)' },
+            lineStyle: { color: '#00e5ff', width: 2 },
+            itemStyle: { color: '#00e5ff' },
+            symbol: 'circle',
+            symbolSize: 5,
+          },
+        ],
+      },
+    ],
+  };
 
   return (
     <motion.div
@@ -53,55 +97,82 @@ function RankingCard({ category }: { category: IRankingCategory }) {
               {category.description}
             </p>
           </div>
+          {/* View toggle */}
+          <button
+            onClick={() => setViewMode(viewMode === 'list' ? 'radar' : 'list')}
+            className="flex items-center gap-1 rounded-md border border-border/40 px-2 py-1 text-xs text-muted-foreground hover:text-primary hover:border-primary/40 transition-colors"
+            aria-label={viewMode === 'list' ? '切换雷达图' : '切换列表'}
+          >
+            {viewMode === 'list' ? (
+              <><Radar className="size-3" /> 雷达</>
+            ) : (
+              <><BarChart3 className="size-3" /> 列表</>
+            )}
+          </button>
         </div>
 
-        {/* 排名列表 */}
-        <div className="space-y-3">
-          {category.items.map((item, index) => {
-            const percentage = Math.round((item.efficiencyValue / maxValue) * 100);
-            const badgeClass = RANK_BADGES[item.rank] || 'bg-muted text-muted-foreground';
+        <AnimatePresence mode="wait">
+          {viewMode === 'list' ? (
+            <motion.div
+              key="list"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="space-y-3"
+            >
+              {category.items.map((item, index) => {
+                const percentage = Math.round((item.efficiencyValue / maxValue) * 100);
+                const badgeClass = RANK_BADGES[item.rank] || 'bg-muted text-muted-foreground';
 
-            return (
-              <motion.div
-                key={item.shipName}
-                initial={{ opacity: 0, x: -12 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
-                className="flex items-center gap-3"
-              >
-                {/* 排名徽章 */}
-                <span
-                  className={`flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-bold tabular-nums ${badgeClass}`}
-                >
-                  {item.rank}
-                </span>
-
-                {/* 舰船名称 */}
-                <span className="w-28 shrink-0 truncate text-sm font-medium text-foreground">
-                  {item.shipName}
-                </span>
-
-                {/* 进度条 */}
-                <div className="relative h-2.5 flex-1 overflow-hidden rounded-full bg-muted/60">
+                return (
                   <motion.div
-                    className={`h-full rounded-full ${colors.bar} ${colors.glow}`}
-                    initial={{ width: 0 }}
-                    whileInView={{ width: `${percentage}%` }}
+                    key={item.shipName}
+                    initial={{ opacity: 0, x: -12 }}
+                    whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.8, delay: 0.2 + index * 0.08, ease: [0.16, 1, 0.3, 1] }}
-                    style={{ boxShadow: `0 0 8px currentColor` }}
-                  />
-                </div>
-
-                {/* 效率值 */}
-                <span className="w-10 shrink-0 text-right text-xs font-mono tabular-nums text-muted-foreground">
-                  {item.efficiencyValue}
-                </span>
-              </motion.div>
-            );
-          })}
-        </div>
+                    transition={{ duration: 0.4, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
+                    className="flex items-center gap-3"
+                  >
+                    <span
+                      className={`flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-bold tabular-nums ${badgeClass}`}
+                    >
+                      {item.rank}
+                    </span>
+                    <span className="w-28 shrink-0 truncate text-sm font-medium text-foreground">
+                      {item.shipName}
+                    </span>
+                    <div className="relative h-2.5 flex-1 overflow-hidden rounded-full bg-muted/60">
+                      <motion.div
+                        className={`h-full rounded-full ${colors.bar} ${colors.glow}`}
+                        initial={{ width: 0 }}
+                        whileInView={{ width: `${percentage}%` }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.8, delay: 0.2 + index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                        style={{ boxShadow: `0 0 8px currentColor` }}
+                      />
+                    </div>
+                    <span className="w-10 shrink-0 text-right text-xs font-mono tabular-nums text-muted-foreground">
+                      {item.efficiencyValue}
+                    </span>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="radar"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <ReactECharts
+                option={radarOption}
+                style={{ height: 260 }}
+                opts={{ renderer: 'svg' }}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   );

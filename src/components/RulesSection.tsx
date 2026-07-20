@@ -57,6 +57,7 @@ export default function RulesSection({ id }: RulesSectionProps) {
             transition={{ duration: 0.4, delay: 0.2 }}
             className="mt-5 flex justify-center"
           >
+            {/* eslint-disable-next-line no-restricted-syntax */}
             <a
               href="/rulebook.pdf"
               download
