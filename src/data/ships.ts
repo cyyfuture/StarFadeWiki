@@ -18,6 +18,15 @@ export interface IShip {
   maintenanceLevel: 1 | 2 | 3 | 4
   coreFeatures: string
   imageUrl: string
+
+  /** 战场指挥容量占用(ZC) = 造价/100。推导依据: fp/cost 排序精确复现规则书"战场打击力效率TOP5" */
+  zcCost: number
+  /** 存在威慑(SZ) = 镇守值。库存×0.6 为编队级效应，由运行时计算 */
+  szValue: number
+  /** 常规战力数值化: 载机复合取总和(含中队)，辅助光环取自身值；原文仍在 regularFP */
+  fpNumeric: number
+  /** 维护等级对应停靠设施名 */
+  maintenanceFacility: string
 }
 
 export const MOCK_SHIPS: IShip[] = [
@@ -40,6 +49,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 10,
     maintenanceLevel: 1,
     coreFeatures: '可封存预备役，不占战场指挥位，擅长破交游击、边境骚扰',
+    zcCost: 1,
+    szValue: 4,
+    fpNumeric: 10,
+    maintenanceFacility: '前线补给站',
     imageUrl: ''
   },
   {
@@ -60,6 +73,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 9,
     maintenanceLevel: 1,
     coreFeatures: '开局点亮全敌阵型，全队首回合命中+15%，可探测隐形单位与空间雷场',
+    zcCost: 1.5,
+    szValue: 3,
+    fpNumeric: 8,
+    maintenanceFacility: '前线补给站',
     imageUrl: ''
   },
   {
@@ -80,6 +97,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 1,
     maintenanceLevel: 1,
     coreFeatures: '固定星域部署，提供全域预警，提前3回合侦测敌方入侵舰队，机动极差',
+    zcCost: 3,
+    szValue: 9,
+    fpNumeric: 20,
+    maintenanceFacility: '前线补给站',
     imageUrl: ''
   },
   {
@@ -100,6 +121,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 6,
     maintenanceLevel: 2,
     coreFeatures: '鱼雷伤害额外减免20%，对小型舰船增伤30%，护航后勤舰时自身生存大幅提升',
+    zcCost: 4.5,
+    szValue: 6,
+    fpNumeric: 30,
+    maintenanceFacility: '标准行星星港',
     imageUrl: ''
   },
 
@@ -122,6 +147,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 4,
     maintenanceLevel: 1,
     coreFeatures: '超视距重甲压制，性价比极高，惧怕贴脸突袭近战单位',
+    zcCost: 1.8,
+    szValue: 8,
+    fpNumeric: 25,
+    maintenanceFacility: '前线补给站',
     imageUrl: ''
   },
   {
@@ -142,6 +171,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 2,
     maintenanceLevel: 1,
     coreFeatures: '舰队续航核心，被击毁后全队战力直接腰斩，远征必备核心单位',
+    zcCost: 2,
+    szValue: 2,
+    fpNumeric: 0,
+    maintenanceFacility: '前线补给站',
     imageUrl: ''
   },
   {
@@ -162,6 +195,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 3,
     maintenanceLevel: 2,
     coreFeatures: '战场抢修、护盾中继、拆解轨道要塞，大幅提升舰队持续作战能力',
+    zcCost: 2.2,
+    szValue: 6,
+    fpNumeric: 5,
+    maintenanceFacility: '标准行星星港',
     imageUrl: ''
   },
   {
@@ -182,6 +219,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 4,
     maintenanceLevel: 1,
     coreFeatures: '运载量为补给舰3倍，负责跨星域物资转运，被截击全额损失货物',
+    zcCost: 2.5,
+    szValue: 2,
+    fpNumeric: 0,
+    maintenanceFacility: '前线补给站',
     imageUrl: ''
   },
   {
@@ -202,6 +243,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 2,
     maintenanceLevel: 2,
     coreFeatures: '专属殖民、难民运输功能，无实战海战能力，用于星域扩张剧情',
+    zcCost: 3,
+    szValue: 1,
+    fpNumeric: 5,
+    maintenanceFacility: '标准行星星港',
     imageUrl: ''
   },
   {
@@ -222,6 +267,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 6,
     maintenanceLevel: 2,
     coreFeatures: '全属性无短板，常规遭遇战、边境摩擦万能主力，适配绝大多数低中烈度战局',
+    zcCost: 3.2,
+    szValue: 5,
+    fpNumeric: 35,
+    maintenanceFacility: '标准行星星港',
     imageUrl: ''
   },
   {
@@ -242,6 +291,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 5,
     maintenanceLevel: 2,
     coreFeatures: '清除敌方空间雷场，全队免疫雷场伤害，是攻坚要塞、突破封锁必备前置单位',
+    zcCost: 3.5,
+    szValue: 4,
+    fpNumeric: 10,
+    maintenanceFacility: '标准行星星港',
     imageUrl: ''
   },
   {
@@ -262,6 +315,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 4,
     maintenanceLevel: 2,
     coreFeatures: '全域点防、防空反导、全队弹药伤害减免，舰队必备护航核心',
+    zcCost: 3.8,
+    szValue: 10,
+    fpNumeric: 15,
+    maintenanceFacility: '标准行星星港',
     imageUrl: ''
   },
   {
@@ -282,6 +339,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 7,
     maintenanceLevel: 2,
     coreFeatures: '护盾穿透鱼雷专属机制，专治战列、旗舰等重甲单位，被小船蜂群克制',
+    zcCost: 4,
+    szValue: 3,
+    fpNumeric: 40,
+    maintenanceFacility: '标准行星星港',
     imageUrl: ''
   },
   {
@@ -302,6 +363,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 5,
     maintenanceLevel: 2,
     coreFeatures: '战后回收50%损毁船员，消除战败大额士气惩罚，触发难民救援、人物救治专属剧情',
+    zcCost: 4,
+    szValue: 3,
+    fpNumeric: 0,
+    maintenanceFacility: '标准行星星港',
     imageUrl: ''
   },
   {
@@ -322,6 +387,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 4,
     maintenanceLevel: 2,
     coreFeatures: '战后回收30%损毁舰船合金，前线临时抢修重伤舰船，大幅延长远征续航',
+    zcCost: 4.5,
+    szValue: 2,
+    fpNumeric: 5,
+    maintenanceFacility: '标准行星星港',
     imageUrl: ''
   },
   {
@@ -342,6 +411,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 2,
     maintenanceLevel: 2,
     coreFeatures: '布置固定空间雷场，敌方入场承受高额固定伤害，边境要塞防御核心，无机动战力',
+    zcCost: 5,
+    szValue: 10,
+    fpNumeric: 20,
+    maintenanceFacility: '标准行星星港',
     imageUrl: ''
   },
   {
@@ -362,6 +435,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 10,
     maintenanceLevel: 3,
     coreFeatures: '短距战术折跃，开局直接跳敌方后排，优先锁定补给/督导/武库舰，团战刺客定位',
+    zcCost: 5.5,
+    szValue: 2,
+    fpNumeric: 35,
+    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -382,6 +459,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 9,
     maintenanceLevel: 3,
     coreFeatures: '常规状态敌方无法优先锁定，突袭首回合伤害翻倍，可执行敌后破袭、情报窃取、人员渗透',
+    zcCost: 6,
+    szValue: 1,
+    fpNumeric: 25,
+    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -402,6 +483,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 7,
     maintenanceLevel: 2,
     coreFeatures: '威慑+实战双用最优单位，巡逻、护航、填充舰队规模，全场景性价比最高',
+    zcCost: 7,
+    szValue: 7,
+    fpNumeric: 60,
+    maintenanceFacility: '标准行星星港',
     imageUrl: ''
   },
 
@@ -424,6 +509,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 3,
     maintenanceLevel: 3,
     coreFeatures: '海战弱势，轨道投放陆军，可搭载特战空降中队，占领行星后获得全域资源buff',
+    zcCost: 9,
+    szValue: 3,
+    fpNumeric: 15,
+    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -444,6 +533,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 5,
     maintenanceLevel: 3,
     coreFeatures: '中距离攻坚中坚，介于巡洋与战列之间，均衡承伤输出，团战主力承伤单位',
+    zcCost: 13,
+    szValue: 6,
+    fpNumeric: 80,
+    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -464,6 +557,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 4,
     maintenanceLevel: 3,
     coreFeatures: '敌方全队输出-20%、命中-25%、射程缩短20%，与督导舰buff叠加构成完整指挥电子战体系',
+    zcCost: 16,
+    szValue: 4,
+    fpNumeric: 20,
+    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -484,6 +581,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 6,
     maintenanceLevel: 3,
     coreFeatures: '首回合冲锋伤害+30%，装甲伤害减免额外+25%，专门撕开敌方防御阵线、突破要塞火力网',
+    zcCost: 17,
+    szValue: 5,
+    fpNumeric: 85,
+    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -504,6 +605,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 5,
     maintenanceLevel: 3,
     coreFeatures: '搭载6支无人机蜂群，补充成本仅为战机1/3，适合持续消耗战，专治海量小船蜂群',
+    zcCost: 18,
+    szValue: 5,
+    fpNumeric: 70,
+    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -524,6 +629,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 8,
     maintenanceLevel: 3,
     coreFeatures: '高速重甲战列模板，追杀残舰、快速穿插，防御弱于正统战列舰，机动碾压所有战列',
+    zcCost: 20,
+    szValue: 4,
+    fpNumeric: 90,
+    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -544,6 +653,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 4,
     maintenanceLevel: 4,
     coreFeatures: '全队输出+25%、命中+20%，敌方第一优先集火目标，失去督导舰舰队战力直接对半砍',
+    zcCost: 25,
+    szValue: 6,
+    fpNumeric: 30,
+    maintenanceFacility: '巨型旗舰船坞',
     imageUrl: ''
   },
   {
@@ -564,6 +677,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 3,
     maintenanceLevel: 3,
     coreFeatures: '本体极脆，最多搭载4支战机中队，制空、多目标清杂核心，必须搭配防御舰护航',
+    zcCost: 32,
+    szValue: 5,
+    fpNumeric: 100,
+    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -584,6 +701,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 2,
     maintenanceLevel: 3,
     coreFeatures: '全舰导弹/鱼雷阵列，远程饱和打击天花板，无近距离火炮，被贴脸直接瘫痪',
+    zcCost: 35,
+    szValue: 9,
+    fpNumeric: 90,
+    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -604,6 +725,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 3,
     maintenanceLevel: 3,
     coreFeatures: '行星轨道轰炸伤害天花板，可快速摧毁地表防御工事、陆军集群，配合两栖登陆舰作战效果翻倍',
+    zcCost: 38,
+    szValue: 7,
+    fpNumeric: 50,
+    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -624,6 +749,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 7,
     maintenanceLevel: 3,
     coreFeatures: '战列级火力+战巡级机动，短板护盾薄弱，适合分兵游击、追歼残敌舰队',
+    zcCost: 42,
+    szValue: 3,
+    fpNumeric: 95,
+    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -644,6 +773,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 3,
     maintenanceLevel: 4,
     coreFeatures: '舰载机投放+大范围舰队护盾光环，体系完整后容错率拉满，造价昂贵',
+    zcCost: 42,
+    szValue: 8,
+    fpNumeric: 150,
+    maintenanceFacility: '巨型旗舰船坞',
     imageUrl: ''
   },
   {
@@ -664,6 +797,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 2,
     maintenanceLevel: 3,
     coreFeatures: '全域护盾光环，阵地死守核心，保护航母、督导舰，单舰极难被摧毁，输出偏低',
+    zcCost: 48,
+    szValue: 10,
+    fpNumeric: 60,
+    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -684,6 +821,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 2,
     maintenanceLevel: 4,
     coreFeatures: '最多搭载6支战机中队，制空输出能力碾压常规航母，无护盾光环加成，本体防御弱于护盾航母',
+    zcCost: 50,
+    szValue: 6,
+    fpNumeric: 140,
+    maintenanceFacility: '巨型旗舰船坞',
     imageUrl: ''
   },
   {
@@ -704,6 +845,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 3,
     maintenanceLevel: 3,
     coreFeatures: '常规舰船均衡天花板，攻坚决战主力，标准旗舰候选，舰队核心输出单位',
+    zcCost: 60,
+    szValue: 7,
+    fpNumeric: 100,
+    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
 
@@ -726,6 +871,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 3,
     maintenanceLevel: 4,
     coreFeatures: '全队输出+35%、生存+30%、命中+25%，可同时指挥3支分舰队，全域舰队调度速度+50%，单势力仅可配置1艘',
+    zcCost: 80,
+    szValue: 5,
+    fpNumeric: 40,
+    maintenanceFacility: '巨型旗舰船坞',
     imageUrl: ''
   },
   {
@@ -746,6 +895,10 @@ export const MOCK_SHIPS: IShip[] = [
     dispatch: 2,
     maintenanceLevel: 4,
     coreFeatures: '终局常规巨舰，单舰碾压普通无畏，战略决战核心，建造维护成本极高，全舰维护战力比最低',
+    zcCost: 100,
+    szValue: 8,
+    fpNumeric: 120,
+    maintenanceFacility: '巨型旗舰船坞',
     imageUrl: ''
   }
 ]
