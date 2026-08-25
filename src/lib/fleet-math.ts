@@ -3,7 +3,16 @@ import { RULE_CONSTANTS } from './rules';
 
 /** 构建器舰队单元: 舰船 + 数量 */
 export interface FleetUnitInput {
-  ship: { readonly id: string; readonly cost: number; readonly monthlyMaintenance: number; readonly fpNumeric: number; readonly szValue: number; readonly zcCost: number; readonly maintenanceLevel: 1 | 2 | 3 | 4 };
+  ship: {
+    readonly id: string;
+    readonly name: string;
+    readonly cost: number;
+    readonly monthlyMaintenance: number;
+    readonly fpNumeric: number;
+    readonly szValue: number;
+    readonly zcCost: number;
+    readonly maintenanceLevel: 1 | 2 | 3 | 4;
+  };
   count: number;
 }
 
