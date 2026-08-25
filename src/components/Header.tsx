@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { label: '战斗规则', anchor: '#rules' },
   { label: '配队模板', anchor: '#templates' },
   { label: '配队热力图', anchor: '#fleet-heatmap' },
+  { label: '舰队构建器', anchor: '#builder' },
   { label: '效率排名', anchor: '#rankings' },
 ] as const;
 

@@ -27,6 +27,7 @@ const NAV_SECTIONS: NavSection[] = [
   { label: '跑团战斗规则', anchor: '#rules' },
   { label: '标准配队模板', anchor: '#templates' },
   { label: '配队热力图', anchor: '#fleet-heatmap' },
+  { label: '舰队构建器', anchor: '#builder' },
   { label: '效率梯队排名', anchor: '#rankings' },
 ];
 

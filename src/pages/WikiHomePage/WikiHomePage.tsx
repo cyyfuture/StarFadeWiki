@@ -17,6 +17,8 @@ import TemplatesSection from '@/components/TemplatesSection';
 import FleetHeatmapSection from '@/components/FleetHeatmapSection';
 import RankingsSection from '@/components/RankingsSection';
 import StarfieldBackground from '@/components/StarfieldBackground';
+import { FleetBuilderSection } from '@/components/builder/FleetBuilderSection';
+import { FleetProvider } from '@/context/FleetContext';
 
 import { MOCK_SHIPS, type IShip } from '@/data/ships';
 
@@ -202,6 +204,7 @@ export default function WikiHomePage() {
             sidebarCollapsed ? 'xl:ml-16' : 'xl:ml-60'
           }`}
         >
+          <FleetProvider>
           {/* Hero */}
           <section id="hero" className="w-full">
             <HeroSection />
@@ -363,6 +366,28 @@ export default function WikiHomePage() {
           {/* 配队热力图 */}
           <FleetHeatmapSection />
 
+          {/* 舰队构建器 */}
+          <section id="builder" className="w-full py-12 md:py-16">
+            <div className="max-w-[1600px] mx-auto px-4 md:px-6">
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4 }}
+                className="mb-6"
+              >
+                <h2 className="text-2xl font-bold text-foreground md:text-3xl">
+                  舰队构建器
+                  <span className="ml-3 align-middle text-sm font-normal text-muted-foreground">
+                    输入预算，配出合法、够用、省钱的舰队
+                  </span>
+                </h2>
+                <div className="mt-2 h-1 w-24 rounded-full bg-gradient-to-r from-primary to-accent" />
+              </motion.div>
+              <FleetBuilderSection />
+            </div>
+          </section>
+
           {/* 效率梯队排名 */}
           <section id="rankings" className="w-full py-12 md:py-16">
             <div className="max-w-[1600px] mx-auto px-4 md:px-6">
@@ -371,6 +396,7 @@ export default function WikiHomePage() {
           </section>
 
           <Footer />
+          </FleetProvider>
         </main>
       </div>
 
