@@ -19,6 +19,7 @@ import RankingsSection from '@/components/RankingsSection';
 import StarfieldBackground from '@/components/StarfieldBackground';
 import { FleetBuilderSection } from '@/components/builder/FleetBuilderSection';
 import { FleetProvider } from '@/context/FleetContext';
+import { RulesQuickRef } from '@/components/RulesQuickRef';
 
 import { MOCK_SHIPS, type IShip } from '@/data/ships';
 
@@ -407,6 +408,8 @@ export default function WikiHomePage() {
           if (!open) setDetailShip(null);
         }}
       />
+
+      <RulesQuickRef />
 
       <CompareModal
         ships={selectedShips}
