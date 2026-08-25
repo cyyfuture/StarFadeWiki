@@ -2,6 +2,19 @@
 set -e
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+# Normalize MSYS/Cygwin path to native Windows form for child native processes (node/vite).
+# Without this, git-bash passes /c/Users/... to node.exe which misparses it as a relative
+# path and build output lands in a stray C:\c\... directory while the script exits 0.
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*)
+    if command -v cygpath >/dev/null 2>&1; then
+      ROOT="$(cygpath -m "$ROOT")"
+    else
+      # Fallback: pwd -W prints native drive-letter paths even without cygpath
+      ROOT="$(cd "$(dirname "$0")/.." && pwd -W 2>/dev/null || pwd -P)"
+    fi
+    ;;
+esac
 OUTPUT="$ROOT/dist/output"
 OUTPUT_RESOURCE="$ROOT/dist/output_resource"
 OUTPUT_STATIC="$ROOT/dist/output_static"
@@ -59,6 +72,13 @@ fi
 if [ -d "$ROOT/dist/output_capabilities" ]; then
   cp -r "$ROOT/dist/output_capabilities/." "$OUTPUT/"
   rm -rf "$ROOT/dist/output_capabilities"
+fi
+
+# Guard against silent failure: the merged output must contain a real index.html
+if [ ! -s "$OUTPUT/index.html" ]; then
+  echo "FATAL: $OUTPUT/index.html missing or empty after merge" >&2
+  echo "  (hint: check that vite build wrote to $ROOT/dist/client)" >&2
+  exit 1
 fi
 
 echo "Build complete"
