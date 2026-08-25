@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Zap, TrendingUp, BarChart3, Radar } from 'lucide-react';
-import ReactECharts from 'echarts-for-react';
+import { RadarChart } from '@/components/RadarChart';
 import { MOCK_RANKINGS, type IRankingCategory } from '@/data/rankings';
 
 const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -30,47 +30,10 @@ function RankingCard({ category }: { category: IRankingCategory }) {
   const maxValue = category.items[0]?.efficiencyValue ?? 100;
   const [viewMode, setViewMode] = useState<'list' | 'radar'>('list');
 
-  const radarOption = {
-    radar: {
-      indicator: category.items.map((item) => ({
-        name: item.shipName,
-        max: maxValue,
-      })),
-      center: ['50%', '55%'],
-      radius: '70%',
-      axisName: {
-        color: '#888',
-        fontSize: 10,
-      },
-      splitArea: {
-        areaStyle: {
-          color: ['rgba(0,229,255,0.02)', 'rgba(0,229,255,0.04)'],
-        },
-      },
-      splitLine: {
-        lineStyle: { color: 'rgba(0,229,255,0.2)' },
-      },
-      axisLine: {
-        lineStyle: { color: 'rgba(0,229,255,0.3)' },
-      },
-    },
-    series: [
-      {
-        type: 'radar',
-        data: [
-          {
-            value: category.items.map((item) => item.efficiencyValue),
-            name: category.category,
-            areaStyle: { color: 'rgba(0,229,255,0.15)' },
-            lineStyle: { color: '#00e5ff', width: 2 },
-            itemStyle: { color: '#00e5ff' },
-            symbol: 'circle',
-            symbolSize: 5,
-          },
-        ],
-      },
-    ],
-  };
+  const radarData = category.items.map((item) => ({
+    label: item.shipName,
+    value: item.efficiencyValue,
+  }));
 
   return (
     <motion.div
@@ -164,12 +127,9 @@ function RankingCard({ category }: { category: IRankingCategory }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              className="flex justify-center"
             >
-              <ReactECharts
-                option={radarOption}
-                style={{ height: 260 }}
-                opts={{ renderer: 'svg' }}
-              />
+              <RadarChart data={radarData} max={maxValue} />
             </motion.div>
           )}
         </AnimatePresence>
