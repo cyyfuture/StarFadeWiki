@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Plus, Search, X } from 'lucide-react';
-import { MOCK_SHIPS } from '@/data/ships';
+import { SHIPS_DATA } from '@/data/ships';
 import { useFleet } from '@/context/FleetContext';
 
 const TYPES = ['小型', '中型', '大型', '旗舰'] as const;
@@ -15,7 +15,7 @@ export function ShipPickerPanel() {
 
   const filtered = useMemo(() => {
     const kw = keyword.trim().toLowerCase();
-    return MOCK_SHIPS.filter((s) => {
+    return SHIPS_DATA.filter((s) => {
       if (activeTypes.size > 0 && !activeTypes.has(s.type)) return false;
       if (!kw) return true;
       return (

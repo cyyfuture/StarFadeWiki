@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Zap, TrendingUp, BarChart3, Radar } from 'lucide-react';
 import { RadarChart } from '@/components/RadarChart';
-import { MOCK_RANKINGS, type IRankingCategory } from '@/data/rankings';
+import { RANKINGS_DATA, type IRankingCategory } from '@/data/rankings';
 
 const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   '存在舰队威慑效率': Trophy,
@@ -160,7 +160,7 @@ export default function RankingsSection() {
 
         {/* 三列排名卡片 */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {MOCK_RANKINGS.map((category) => (
+          {RANKINGS_DATA.map((category) => (
             <RankingCard key={category.id} category={category} />
           ))}
         </div>

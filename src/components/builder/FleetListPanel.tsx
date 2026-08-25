@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { AlertTriangle, Minus, Plus, Trash2 } from 'lucide-react';
-import { MOCK_SHIPS } from '@/data/ships';
+import { SHIPS_DATA } from '@/data/ships';
 import { useFleet, resolveUnits } from '@/context/FleetContext';
 import { calcFleetTotals, checkCommandCap } from '@/lib/fleet-math';
 
@@ -12,7 +12,7 @@ function fmt(n: number): string {
 export function FleetListPanel() {
   const { units, setCount, removeUnit, clear, budget, commandCap } = useFleet();
 
-  const resolved = useMemo(() => resolveUnits(units, MOCK_SHIPS), [units]);
+  const resolved = useMemo(() => resolveUnits(units, SHIPS_DATA), [units]);
   const totals = useMemo(() => calcFleetTotals(resolved), [resolved]);
   const cap = useMemo(() => checkCommandCap(totals.totalZC, commandCap), [totals.totalZC, commandCap]);
 

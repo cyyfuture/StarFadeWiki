@@ -1,4 +1,4 @@
-// EXPORTS: IFleetTemplate, MOCK_FLEET_TEMPLATES
+// EXPORTS: IFleetTemplate, FLEET_TEMPLATES_DATA
 export interface IFleetTemplate {
   id: string
   name: string
@@ -8,7 +8,7 @@ export interface IFleetTemplate {
   imageUrl: string
 }
 
-export const MOCK_FLEET_TEMPLATES: IFleetTemplate[] = [
+export const FLEET_TEMPLATES_DATA: IFleetTemplate[] = [
   {
     id: '1',
     name: '威慑种田舰队',

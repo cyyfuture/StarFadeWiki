@@ -1,4 +1,4 @@
-// EXPORTS: IRule, MOCK_RULES
+// EXPORTS: IRule, RULES_DATA
 export interface IRule {
   id: string
   title: string
@@ -7,7 +7,7 @@ export interface IRule {
   example: string
 }
 
-export const MOCK_RULES: IRule[] = [
+export const RULES_DATA: IRule[] = [
   {
     id: '1',
     title: '指挥上限机制',

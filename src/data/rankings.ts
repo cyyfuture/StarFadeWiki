@@ -1,4 +1,4 @@
-// EXPORTS: IRankingItem, IRankingCategory, MOCK_RANKINGS
+// EXPORTS: IRankingItem, IRankingCategory, RANKINGS_DATA
 export interface IRankingItem {
   rank: number
   shipName: string
@@ -13,7 +13,7 @@ export interface IRankingCategory {
   imageUrl: string
 }
 
-export const MOCK_RANKINGS: IRankingCategory[] = [
+export const RANKINGS_DATA: IRankingCategory[] = [
   {
     id: '1',
     category: '存在舰队威慑效率TOP5',

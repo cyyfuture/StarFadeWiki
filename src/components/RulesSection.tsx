@@ -4,7 +4,7 @@ import { Shield, Swords, Scale, Wrench, ChevronDown, ChevronUp, FileText, Downlo
 import { Image } from '@/components/ui/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MOCK_RULES, type IRule } from '@/data/rules';
+import { RULES_DATA, type IRule } from '@/data/rules';
 
 const RULE_ICONS: Record<string, typeof Shield> = {
   '指挥上限机制': Swords,
@@ -25,13 +25,13 @@ interface RulesSectionProps {
 }
 
 export default function RulesSection({ id }: RulesSectionProps) {
-  const [expandedRuleId, setExpandedRuleId] = useState<string | null>(MOCK_RULES[0]?.id ?? null);
+  const [expandedRuleId, setExpandedRuleId] = useState<string | null>(RULES_DATA[0]?.id ?? null);
 
   const toggleRule = (ruleId: string) => {
     setExpandedRuleId(prev => (prev === ruleId ? null : ruleId));
   };
 
-  const sortedRules = useMemo(() => MOCK_RULES, []);
+  const sortedRules = useMemo(() => RULES_DATA, []);
 
   return (
     <section id={id} className="w-full py-16 md:py-20">

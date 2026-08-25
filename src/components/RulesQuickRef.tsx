@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { BookOpen } from 'lucide-react';
-import { MOCK_RULES } from '@/data/rules';
+import { RULES_DATA } from '@/data/rules';
 import { MAINTENANCE_FACILITIES, RULE_CONSTANTS } from '@/lib/rules';
 
 /** 全局规则速查: 任意位置按 ? 呼出（输入框聚焦时除外），Esc 关闭 */
@@ -39,7 +39,7 @@ export function RulesQuickRef() {
         </DialogHeader>
 
         <div className="space-y-3">
-          {MOCK_RULES.map((r) => (
+          {RULES_DATA.map((r) => (
             <div key={r.id} className="rounded-md border border-border/50 p-3">
               <div className="flex items-baseline justify-between gap-2">
                 <span className="text-sm font-semibold text-foreground">{r.title}</span>

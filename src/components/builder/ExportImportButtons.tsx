@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react';
-import { ClipboardPaste, Download, Upload } from 'lucide-react';
+import { ClipboardPaste, Download, Link2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
-import { MOCK_SHIPS } from '@/data/ships';
+import { SHIPS_DATA } from '@/data/ships';
 import { useFleet, resolveUnits } from '@/context/FleetContext';
 import { exportFleet, importFleet } from '@/lib/fleet-math';
+import { buildShareUrl } from './share';
 
 /** 导出/导入舰队方案（JSON 文件 + 剪贴板） */
 export function ExportImportButtons() {
@@ -19,7 +20,7 @@ export function ExportImportButtons() {
       toast.error('舰队为空，没有可导出的内容');
       return;
     }
-    const resolved = resolveUnits(units, MOCK_SHIPS);
+    const resolved = resolveUnits(units, SHIPS_DATA);
     const json = exportFleet(resolved, budget ?? undefined, commandCap);
     try {
       navigator.clipboard.writeText(json);
@@ -36,8 +37,24 @@ export function ExportImportButtons() {
     URL.revokeObjectURL(url);
   };
 
+  const doShare = () => {
+    if (!hasUnits) {
+      toast.error('舰队为空，没有可分享的内容');
+      return;
+    }
+    const resolved = resolveUnits(units, SHIPS_DATA);
+    const url = buildShareUrl(
+      resolved.map((u) => ({ shipId: u.ship.id, count: u.count })),
+      budget
+    );
+    navigator.clipboard
+      .writeText(url)
+      .then(() => toast.success('分享链接已复制——发给朋友即可一键导入'))
+      .catch(() => toast.error(url, { duration: 15000, description: '剪贴板不可用，请手动复制上方链接' }));
+  };
+
   const applyImport = (text: string) => {
-    const r = importFleet(text, (id) => MOCK_SHIPS.find((s) => s.id === id));
+    const r = importFleet(text, (id) => SHIPS_DATA.find((s) => s.id === id));
     if ('error' in r) {
       toast.error(r.error);
       return;
@@ -57,6 +74,14 @@ export function ExportImportButtons() {
         >
           <Download className="size-3.5" />
           导出方案
+        </button>
+        <button
+          onClick={doShare}
+          aria-label="复制分享链接"
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-accent/50 hover:text-accent"
+        >
+          <Link2 className="size-3.5" />
+          分享链接
         </button>
         <button
           onClick={() => fileRef.current?.click()}

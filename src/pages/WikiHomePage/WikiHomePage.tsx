@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -20,8 +20,9 @@ import StarfieldBackground from '@/components/StarfieldBackground';
 import { FleetBuilderSection } from '@/components/builder/FleetBuilderSection';
 import { FleetProvider } from '@/context/FleetContext';
 import { RulesQuickRef } from '@/components/RulesQuickRef';
+import { CommandPalette } from '@/components/CommandPalette';
 
-import { MOCK_SHIPS, type IShip } from '@/data/ships';
+import { SHIPS_DATA, type IShip } from '@/data/ships';
 
 const TYPE_ORDER = ['小型', '中型', '大型', '旗舰'] as const;
 const TYPE_ANCHORS: Record<string, string> = {
@@ -43,6 +44,16 @@ export default function WikiHomePage() {
   // --- 舰船详情 ---
   const [detailShip, setDetailShip] = useState<IShip | null>(null);
 
+  // Command Palette 选舰 → 打开详情弹窗
+  useEffect(() => {
+    const onOpenShip = (e: Event) => {
+      const ship = SHIPS_DATA.find((s) => s.id === (e as CustomEvent<string>).detail);
+      if (ship) setDetailShip(ship);
+    };
+    window.addEventListener('starfade:open-ship', onOpenShip);
+    return () => window.removeEventListener('starfade:open-ship', onOpenShip);
+  }, []);
+
   // --- 对比 ---
   const [selectedShipIds, setSelectedShipIds] = useState<Set<string>>(new Set());
   const [compareOpen, setCompareOpen] = useState(false);
@@ -55,7 +66,7 @@ export default function WikiHomePage() {
 
   // --- 筛选 + 排序 + 搜索 ---
   const filteredShips = useMemo(() => {
-    let result = [...MOCK_SHIPS];
+    let result = [...SHIPS_DATA];
 
     if (shipFilter.types.length > 0) {
       const types = new Set(shipFilter.types);
@@ -135,7 +146,7 @@ export default function WikiHomePage() {
   }, []);
 
   const selectedShips = useMemo(
-    () => MOCK_SHIPS.filter((s) => selectedShipIds.has(s.id)),
+    () => SHIPS_DATA.filter((s) => selectedShipIds.has(s.id)),
     [selectedShipIds],
   );
 
@@ -229,7 +240,7 @@ export default function WikiHomePage() {
                   >◆</motion.span>{' '}
                   全舰种数据总表
                   <span className="ml-2 text-sm font-normal text-muted-foreground">
-                    {MOCK_SHIPS.length} 种舰船
+                    {SHIPS_DATA.length} 种舰船
                   </span>
                 </h2>
                 <p className="mt-2 text-muted-foreground text-sm">
@@ -249,7 +260,7 @@ export default function WikiHomePage() {
               >
                 <span className="text-xs text-muted-foreground mr-1">快速跳转:</span>
                 {TYPE_ORDER.map((t) => {
-                  const count = MOCK_SHIPS.filter((s) => s.type === t).length;
+                  const count = SHIPS_DATA.filter((s) => s.type === t).length;
                   return (
                     <motion.a
                       key={t}
@@ -410,6 +421,8 @@ export default function WikiHomePage() {
       />
 
       <RulesQuickRef />
+
+      <CommandPalette />
 
       <CompareModal
         ships={selectedShips}

@@ -1,13 +1,13 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Thermometer, Info } from 'lucide-react';
-import { MOCK_FLEET_TEMPLATES, type IFleetTemplate } from '@/data/fleettemplates';
-import { MOCK_SHIPS } from '@/data/ships';
+import { FLEET_TEMPLATES_DATA, type IFleetTemplate } from '@/data/fleettemplates';
+import { SHIPS_DATA } from '@/data/ships';
 
 // Build ship lookups from actual data
 const SHIP_ROLE_MAP = new Map<string, string>();
 const SHIP_TYPE_MAP = new Map<string, string>();
-MOCK_SHIPS.forEach((s) => {
+SHIPS_DATA.forEach((s) => {
   SHIP_ROLE_MAP.set(s.name, s.role);
   SHIP_TYPE_MAP.set(s.name, s.type);
 });
@@ -52,7 +52,7 @@ function buildMatrix(
   dimension: 'role' | 'type',
   categories: readonly string[],
 ) {
-  return MOCK_FLEET_TEMPLATES.map((template) => {
+  return FLEET_TEMPLATES_DATA.map((template) => {
     const counts: Record<string, number> = {};
     categories.forEach((c) => { counts[c] = 0; });
 
@@ -150,7 +150,7 @@ export default function FleetHeatmapSection() {
               <div className="flex items-center justify-end pr-3 text-xs font-semibold tracking-wider text-muted-foreground/60 uppercase">
                 {viewMode === 'role' ? '角色 \\ 配队' : '吨位 \\ 配队'}
               </div>
-              {MOCK_FLEET_TEMPLATES.map((t) => (
+              {FLEET_TEMPLATES_DATA.map((t) => (
                 <div key={t.id} className="rounded-lg bg-muted/30 px-3 py-2 text-center">
                   <span className="block truncate text-xs font-semibold text-foreground">
                     {t.name}

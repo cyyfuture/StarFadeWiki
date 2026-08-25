@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Sparkles, Wand2 } from 'lucide-react';
-import { MOCK_SHIPS } from '@/data/ships';
+import { SHIPS_DATA } from '@/data/ships';
 import { useFleet } from '@/context/FleetContext';
 import { optimizeFleet, type OptimizeResult } from '@/lib/fleet-math';
 
@@ -18,7 +18,7 @@ export function OptimizePanel() {
     const b = parseInt(input, 10);
     if (!Number.isFinite(b) || b <= 0) return;
     setBudget(b);
-    setResult(optimizeFleet(MOCK_SHIPS, b, commandCap));
+    setResult(optimizeFleet(SHIPS_DATA, b, commandCap));
   };
 
   const apply = () => {
@@ -89,7 +89,7 @@ export function OptimizePanel() {
 
               <div className="max-h-40 space-y-1 overflow-y-auto rounded-md border border-border/30 p-2">
                 {result.units.map((u) => {
-                  const ship = MOCK_SHIPS.find((s) => s.id === u.shipId);
+                  const ship = SHIPS_DATA.find((s) => s.id === u.shipId);
                   return (
                     <div key={u.shipId} className="flex items-center justify-between text-xs">
                       <span className="text-foreground">{ship?.name ?? u.shipId}</span>

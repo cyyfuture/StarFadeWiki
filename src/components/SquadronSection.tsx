@@ -12,7 +12,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
-import { ISquadron, MOCK_SQUADRONS } from '@/data/squadrons';
+import { ISquadron, SQUADRONS_DATA } from '@/data/squadrons';
 
 const ROLE_ICONS: Record<string, typeof Zap> = {
   '防空制空': Shield,
@@ -193,7 +193,7 @@ export default function SquadronSection() {
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   const sortedSquadrons = useMemo(() => {
-    const arr = [...MOCK_SQUADRONS];
+    const arr = [...SQUADRONS_DATA];
     arr.sort((a, b) => {
       let va: number;
       let vb: number;
@@ -307,7 +307,7 @@ export default function SquadronSection() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {MOCK_SQUADRONS.map((sq, i) => (
+                    {SQUADRONS_DATA.map((sq, i) => (
                       <TableRow
                         key={sq.id}
                         className={cn(

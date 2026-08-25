@@ -1,4 +1,4 @@
-// EXPORTS: ISquadron, MOCK_SQUADRONS
+// EXPORTS: ISquadron, SQUADRONS_DATA
 export interface ISquadron {
   id: string
   name: string
@@ -12,7 +12,7 @@ export interface ISquadron {
   imageUrl: string
 }
 
-export const MOCK_SQUADRONS: ISquadron[] = [
+export const SQUADRONS_DATA: ISquadron[] = [
   {
     id: '1',
     name: '拦截中队',

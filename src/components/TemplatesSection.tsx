@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Shield, Swords, Zap, ChevronRight, Anchor } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MOCK_FLEET_TEMPLATES, type IFleetTemplate } from '@/data/fleettemplates';
+import { FLEET_TEMPLATES_DATA, type IFleetTemplate } from '@/data/fleettemplates';
 
 const TEMPLATE_ICONS: Record<string, typeof Shield> = {
   '威慑种田舰队': Shield,
@@ -39,7 +39,7 @@ function formatCost(cost: number): string {
 export default function TemplatesSection() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const maxCost = Math.max(...MOCK_FLEET_TEMPLATES.map((t) => t.totalCost));
+  const maxCost = Math.max(...FLEET_TEMPLATES_DATA.map((t) => t.totalCost));
 
   const toggleExpand = (id: string) => {
     setExpandedId((prev) => (prev === id ? null : id));
@@ -66,7 +66,7 @@ export default function TemplatesSection() {
 
         {/* Template Cards Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {MOCK_FLEET_TEMPLATES.map((template, i) => {
+          {FLEET_TEMPLATES_DATA.map((template, i) => {
             const Icon = TEMPLATE_ICONS[template.name] || Anchor;
             const gradient = TEMPLATE_GRADIENTS[template.name] || 'from-primary/20 via-primary/5 to-transparent';
             const borderColor = TEMPLATE_BORDER_COLORS[template.name] || 'border-primary/30 hover:border-primary/60';

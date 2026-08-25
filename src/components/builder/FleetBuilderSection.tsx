@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ListPlus, Rocket } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useFleetShareListener } from './share';
 import { ShipPickerPanel } from './ShipPickerPanel';
 import { FleetListPanel } from './FleetListPanel';
 import { OptimizePanel } from './OptimizePanel';
@@ -12,6 +13,7 @@ type MobileTab = 'pick' | 'fleet';
 export function FleetBuilderSection() {
   const isMobile = useIsMobile();
   const [tab, setTab] = useState<MobileTab>('pick');
+  useFleetShareListener();
 
   const picker = <ShipPickerPanel />;
   const list = <FleetListPanel />;

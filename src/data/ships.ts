@@ -1,4 +1,4 @@
-// EXPORTS: IShip, MOCK_SHIPS
+// EXPORTS: IShip, SHIPS_DATA
 export interface IShip {
   id: string
   name: string
@@ -29,7 +29,7 @@ export interface IShip {
   maintenanceFacility: string
 }
 
-export const MOCK_SHIPS: IShip[] = [
+export const SHIPS_DATA: IShip[] = [
   // ===== 小型舰船 (4艘) =====
   {
     id: '1',
