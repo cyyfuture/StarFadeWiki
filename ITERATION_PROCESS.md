@@ -100,10 +100,10 @@ done
 
 | 项目 | 值 |
 |------|-----|
-| 当前版本 | v3.0 舰队构建器版（2026-08-26） |
-| 已完成 Task | P0修复(build.sh MSYS路径+bundle -71%)+v2.0设计迭代+**v3.0舰队构建器**(FleetContext/选船面板/清单统计栏/ZC超限警告/一键优化/导出导入/移动端tab/规则速查?) + vitest 13测试全绿 |
-| 待办 | v4.0 功能增强（Command Palette+对比增强+智能推荐） |
-| 下一迭代目标 | v4.0: Command Palette + URL分享方案 + 智能推荐(ILP精确优化) |
+| 当前版本 | v3.0 舰队构建器版 ✅ + **v4.0 启动**（2026-08-26） |
+| 已完成 Task | P0修复(build.sh MSYS路径+bundle -71%)+v2.0设计迭代+**v3.0舰队构建器**(FleetContext/选船面板/清单统计栏/ZC超限警告/一键优化/导出导入/移动端tab/规则速查?) + vitest 16测试全绿 |
+| v4.0 已做 | Command Palette(Ctrl+K, cmdk) + 分享链接(#fleet=base64url) + 数据命名对齐AGENTS.md(MOCK_*→*_DATA) |
+| 待办 | v4.0 余项：ILP精确优化(替换贪心) + 对比增强 + 部署验证(push被凭证阻塞待用户) |
 
 ---
 

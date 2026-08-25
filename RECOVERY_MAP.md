@@ -64,8 +64,9 @@ public/rulebook.pdf      # 规则书下载(612KB)
   - 整合: #builder 锚点(热力图与排名之间), Header/AppSidebar 导航项 ✅
   - 规则速查: RulesQuickRef 按 ? 呼出 Dialog ✅
 - ⚠️ 已知坑: 项目 tsconfig strict=false → boolean判别式联合不收窄, 必须用 `'error' in r` 模式; 本机起 http.server 后须先杀进程再 build(dist 占用)
-- ⬜ 待做(v4计划): Command Palette + URL分享方案(#fleet=base64) + ILP精确优化 + 对比增强
-- ⬜ 卫生项(低优先): 组件归位 pages/WikiHomePage/components；MOCK_SHIPS 更名 SHIPS_DATA(对齐AGENTS.md)；RankingsSection 雷达图浏览器内最终目视确认
+- ⬜ 待做(v4计划): ~~Command Palette~~✅ ~~URL分享方案~~✅ ~~数据命名对齐~~✅；余项: ILP精确优化(替换贪心) + 对比增强 + Cloudflare部署验证
+- ⚠️ push 边界: remote 经 ghproxy 镜像且 credential helper 需 GUI 弹窗，agent 后台无法交互 → 用户手动 `git push origin master --tags`
+- ⬜ 卫生项(低优先): 组件归位 pages/WikiHomePage/components；RankingsSection 雷达图浏览器内最终目视确认
 
 ## 8. 恢复指令
 1. `cd C:/Users/cyy/Desktop/Code/StarFadeWiki && npm run typecheck`（当前应通过）
