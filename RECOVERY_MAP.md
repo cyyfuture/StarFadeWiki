@@ -1,7 +1,7 @@
 # 🗺️ StarFadeWiki — 遗忘恢复地图
 
-> 最后更新: 2026-08-26 | 更新者: AI (全面审计)
-> 项目状态: 🟡暂停 (最后提交 2026-07-20，已搁置约 5 周)
+> 最后更新: 2026-08-26 05:15 (v3.0 迭代完成) | 更新者: AI
+> 项目状态: 🟢活跃 (v3.0 舰队构建器版已交付，v4.0 待启动)
 
 ## 1. 项目身份
 - **目录**: C:\Users\cyy\Desktop\Code\StarFadeWiki
@@ -56,12 +56,16 @@ public/rulebook.pdf      # 规则书下载(612KB)
 外围: ../backup/{000_原始版,001_v1.0_P0改进版,001_v1.0_修复版}、../外围数据/(PDF/DOCX原始素材)、Problem/(构建日志)
 
 ## 7. 当前进度
-- ✅ 已完成: v0全量(36舰+7机+规则+模板+排名) → v1.0修复(props/搜索联动/SEO/favicon) → v2.0设计迭代(浅色主题/useTheme/热力图/进度条/响应式)；typecheck 当前通过 ✅
-- ❌ 断层1: **本机构建坏** — build.sh 把 MSYS 风格 `/c/...` 路径传给原生 vite，产物落去杂散目录 `C:\c\Users\...\dist\client`，`dist/output` 为**空**但 exit 0（静默失败）。远程 Linux CI 构建大概率正常（7月曾部署成功）。修法：build.sh 内用 cygpath -m 或让 vite 相对 outDir。
-- ❌ 断层2: bundle 1.68MB(gzip 546KB) 单 chunk——echarts+recharts 双图表库、gsap+framer-motion 双动画库并存，需裁一个
-- ⬜ 待做(v3计划): 舰队构建器 + 规则速查 + 筛选增强
-- ⬜ 待做(v4计划): Command Palette + 对比增强 + 智能推荐
-- ⬜ 卫生项: .hermes/plans 未提交；mammoth/pdf-parse 应移 devDependencies；组件归位 pages/WikiHomePage/components；MOCK_SHIPS 更名 SHIPS_DATA(对齐AGENTS.md)
+- ✅ v0全量(36舰+7机+规则+模板+排名) → v1.0修复 → v2.0设计迭代 → **v3.0 舰队构建器版(2026-08-26)**:
+  - P0修复: build.sh MSYS路径(cygpath -m + 空产物保险丝) ✅ / bundle 1684KB→585KB(-65%, SVG雷达替代echarts, 删recharts/gsap) ✅
+  - 数据层: IShip 扩展 zcCost/szValue/fpNumeric/maintenanceFacility(36/36补录, 零NaN) ✅ 推导依据写入 ships.ts 注释与 scripts/backfill-ships.cjs
+  - 计算内核: src/lib/fleet-math.ts (totals/capCheck/deterrence/optimize/export-import) + src/lib/rules.ts 常量单一来源 + **vitest 13测试全绿** ✅
+  - 构建器UI: src/components/builder/* (ShipPicker/FleetList含ZC超限红字/OptimizePanel贪心推荐/ExportImport zod校验) + FleetContext(__wiki_fleet_v1) ✅
+  - 整合: #builder 锚点(热力图与排名之间), Header/AppSidebar 导航项 ✅
+  - 规则速查: RulesQuickRef 按 ? 呼出 Dialog ✅
+- ⚠️ 已知坑: 项目 tsconfig strict=false → boolean判别式联合不收窄, 必须用 `'error' in r` 模式; 本机起 http.server 后须先杀进程再 build(dist 占用)
+- ⬜ 待做(v4计划): Command Palette + URL分享方案(#fleet=base64) + ILP精确优化 + 对比增强
+- ⬜ 卫生项(低优先): 组件归位 pages/WikiHomePage/components；MOCK_SHIPS 更名 SHIPS_DATA(对齐AGENTS.md)；RankingsSection 雷达图浏览器内最终目视确认
 
 ## 8. 恢复指令
 1. `cd C:/Users/cyy/Desktop/Code/StarFadeWiki && npm run typecheck`（当前应通过）
