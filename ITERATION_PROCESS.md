@@ -107,4 +107,20 @@ done
 
 ---
 
+## 2026-10-25 深度研究 + 波次0应急止损（10 子代理审查后执行）
+
+> 全套报告见 `E:\Code\研究报告\01~10`，总纲见 `E:\Code\深度研究与改进-计划总纲-20261023.md`。
+> 总纲技术裁定已修正 v4.0 方向：**放弃 ILP**（实测贪心与精确 DP 差距 0.00%），改 Web Worker 粒化 DP。
+
+| 波次0动作 | 结果 |
+|-----------|------|
+| P0-1 push 保命 | ✅ 10 个积压提交 + 波次0修复提交 `253d7c0` 均已推送（aeac6d6..253d7c0），ahead 归零 |
+| P0-2 MSYS 污染根治 | ✅ build.sh 增加 `MSYS_NO_PATHCONV=1` + `MSYS2_ENV_CONV_EXCL='*'`（根治 `/`开头变量被改写为 Git 安装根）；守卫升级：检出 `Program Files` 污染即 FATAL + 校验 index.html 引用的 assets 全部存在。已重建 dist：0 污染、引用完整 |
+| P0-3 Toaster 挂载 | ✅ app 根部挂载（此前从未被引用，8 处 toast 全部静默失效）；typecheck 通过 |
+| P0-4 wrangler | ✅ wrangler@4.152 入 devDependencies（消除 npx 临时安装这条 6-29 部署失败路径）+ 新增 `npm run deploy`；**部署本体阻塞在交互式 `wrangler login`，待用户执行** |
+| P0-5 tag | ✅ `v3.0`→f5831cc、`v4.0-start`→d8bf7a3 已推送远端；.hermes v4 计划文件已收编入库 |
+| 波次1 预告 | 前端 9 项 P1（约12h）→ 总册→TS 校验器 → 光环建模（优化器 685→真最优 959）→ 文档 v2.0 翻新 |
+
+---
+
 *本文件随项目迭代持续更新*
