@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { NavLink } from '@lark-apaas/client-toolkit-lite';
-import { Search, Sun, Moon, Menu, X, ArrowUp } from 'lucide-react';
+import { Search, Sun, Moon, Menu, X, ArrowUp, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -22,9 +22,11 @@ interface HeaderProps {
   theme: 'dark' | 'light';
   onToggleTheme: () => void;
   onSearch?: (keyword: string) => void;
+  /** 打开跑团规则速查（与物理 ? 键共用同一 Dialog）——补移动端无键盘的入口缺口 */
+  onOpenRules?: () => void;
 }
 
-export default function Header({ theme, onToggleTheme, onSearch }: HeaderProps) {
+export default function Header({ theme, onToggleTheme, onSearch, onOpenRules }: HeaderProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -156,6 +158,17 @@ export default function Header({ theme, onToggleTheme, onSearch }: HeaderProps) 
                 <Search className="size-4" />
               </Button>
             )}
+
+            {/* Rules Quick Ref（移动端无物理键盘的唯一入口） */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 text-muted-foreground hover:text-foreground"
+              onClick={onOpenRules}
+              aria-label="跑团规则速查"
+            >
+              <BookOpen className="size-4" />
+            </Button>
 
             {/* Theme Toggle */}
             <Button

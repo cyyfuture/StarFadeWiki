@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 import { ISquadron, SQUADRONS_DATA } from '@/data/squadrons';
+import { maintenanceFacilityName } from '@/lib/format';
 
 const ROLE_ICONS: Record<string, typeof Zap> = {
   '防空制空': Shield,
@@ -22,13 +23,6 @@ const ROLE_ICONS: Record<string, typeof Zap> = {
   '护盾穿透反旗舰': Zap,
   '功能辅助致盲': Wrench,
   '特种作战夺舰': Crosshair,
-};
-
-const MAINTENANCE_LABELS: Record<number, string> = {
-  1: '前线补给站',
-  2: '标准行星星港',
-  3: '大型轨道船坞',
-  4: '巨型旗舰船坞',
 };
 
 function getRoleIcon(role: string) {
@@ -81,7 +75,7 @@ function SquadronCard({ squadron, index }: { squadron: ISquadron; index: number 
                     {squadron.role}
                   </Badge>
                   <span className="text-xs text-muted-foreground">
-                    {MAINTENANCE_LABELS[squadron.maintenanceLevel] || `${squadron.maintenanceLevel}级维护`}
+                    {maintenanceFacilityName(squadron.maintenanceLevel)}
                   </span>
                 </div>
               </div>
@@ -164,7 +158,7 @@ function SquadronCard({ squadron, index }: { squadron: ISquadron; index: number 
                 <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground">维护等级</span>
                   <span className="text-foreground font-medium">
-                    Lv.{squadron.maintenanceLevel} · {MAINTENANCE_LABELS[squadron.maintenanceLevel] || `${squadron.maintenanceLevel}级`}
+                    Lv.{squadron.maintenanceLevel} · {maintenanceFacilityName(squadron.maintenanceLevel)}
                   </span>
                 </div>
                 <div className="flex justify-between text-xs">
@@ -239,8 +233,9 @@ export default function SquadronSection() {
     </button>
   );
 
+  // 区块锚点 id="squadrons" 由 WikiHomePage 编排层输出
   return (
-    <section id="squadrons" className="w-full py-16 md:py-20">
+    <section className="w-full py-16 md:py-20">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         {/* 区块标题 */}
         <motion.div
@@ -341,7 +336,7 @@ export default function SquadronSection() {
                         <TableCell className="whitespace-nowrap tabular-nums text-sm">{sq.monthlyMaintenance}</TableCell>
                         <TableCell className="whitespace-nowrap tabular-nums text-sm text-primary font-semibold">{sq.regularFP}</TableCell>
                         <TableCell className="whitespace-nowrap tabular-nums text-sm">
-                          {typeof sq.peakFP === 'number' ? sq.peakFP : sq.peakFP}
+                          {sq.peakFP}
                         </TableCell>
                         <TableCell className="whitespace-nowrap text-sm">
                           <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5 border-primary/30 text-primary/80">

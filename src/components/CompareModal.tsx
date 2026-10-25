@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { formatValue, maintenanceFacilityName } from '@/lib/format';
 import { IShip } from '@/data/ships';
 
 interface CompareModalProps {
@@ -17,31 +18,20 @@ interface CompareModalProps {
   onRemoveShip: (shipId: string) => void;
 }
 
+/** 完整字面量色板；text-*-300 仅深色可读，浅色主题用 light: 变体补 -700 */
 const TYPE_COLORS: Record<IShip['type'], string> = {
-  '小型': 'border-cyan-400/60 bg-cyan-500/10 text-cyan-300',
-  '中型': 'border-emerald-400/60 bg-emerald-500/10 text-emerald-300',
-  '大型': 'border-amber-400/60 bg-amber-500/10 text-amber-300',
-  '旗舰': 'border-rose-400/60 bg-rose-500/10 text-rose-300',
+  '小型': 'border-cyan-400/60 bg-cyan-500/10 text-cyan-300 light:text-cyan-700',
+  '中型': 'border-emerald-400/60 bg-emerald-500/10 text-emerald-300 light:text-emerald-700',
+  '大型': 'border-amber-400/60 bg-amber-500/10 text-amber-300 light:text-amber-700',
+  '旗舰': 'border-rose-400/60 bg-rose-500/10 text-rose-300 light:text-rose-700',
 };
 
 const ROLE_COLORS: Record<IShip['role'], string> = {
-  '打击': 'border-red-400/60 bg-red-500/10 text-red-300',
-  '防御': 'border-blue-400/60 bg-blue-500/10 text-blue-300',
-  '辅助': 'border-purple-400/60 bg-purple-500/10 text-purple-300',
-  '后勤': 'border-teal-400/60 bg-teal-500/10 text-teal-300',
+  '打击': 'border-red-400/60 bg-red-500/10 text-red-300 light:text-red-700',
+  '防御': 'border-blue-400/60 bg-blue-500/10 text-blue-300 light:text-blue-700',
+  '辅助': 'border-purple-400/60 bg-purple-500/10 text-purple-300 light:text-purple-700',
+  '后勤': 'border-teal-400/60 bg-teal-500/10 text-teal-300 light:text-teal-700',
 };
-
-const MAINTENANCE_LABELS: Record<number, string> = {
-  1: 'Ⅰ 前线补给站',
-  2: 'Ⅱ 标准行星星港',
-  3: 'Ⅲ 大型轨道船坞',
-  4: 'Ⅳ 巨型旗舰船坞',
-};
-
-function formatValue(v: number | string): string {
-  if (typeof v === 'number') return v.toLocaleString();
-  return v;
-}
 
 function isNumeric(v: number | string): v is number {
   return typeof v === 'number';
@@ -225,9 +215,9 @@ export default function CompareModal({ open, onOpenChange, ships, onRemoveShip }
                     </td>
                     {sortedShips.map((ship) => (
                       <td key={ship.id} className="px-4 py-2.5 text-center tabular-nums font-mono text-sm">
-                        <span className="text-emerald-400">{formatValue(ship.peakFP)}</span>
+                        <span className="text-emerald-400 light:text-emerald-700">{formatValue(ship.peakFP)}</span>
                         <span className="text-muted-foreground mx-1">/</span>
-                        <span className="text-rose-400">{formatValue(ship.valleyFP)}</span>
+                        <span className="text-rose-400 light:text-rose-700">{formatValue(ship.valleyFP)}</span>
                       </td>
                     ))}
                   </tr>
@@ -292,8 +282,8 @@ export default function CompareModal({ open, onOpenChange, ships, onRemoveShip }
                     </td>
                     {sortedShips.map((ship) => (
                       <td key={ship.id} className="px-4 py-2.5 text-center">
-                        <Badge variant="outline" className="border-amber-400/40 bg-amber-500/10 text-amber-300 text-xs">
-                          {MAINTENANCE_LABELS[ship.maintenanceLevel]}
+                        <Badge variant="outline" className="border-amber-400/40 bg-amber-500/10 text-amber-300 light:text-amber-700 text-xs">
+                          {maintenanceFacilityName(ship.maintenanceLevel)}
                         </Badge>
                       </td>
                     ))}

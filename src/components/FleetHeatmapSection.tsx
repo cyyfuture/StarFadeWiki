@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Thermometer, Info } from 'lucide-react';
 import { FLEET_TEMPLATES_DATA, type IFleetTemplate } from '@/data/fleettemplates';
 import { SHIPS_DATA } from '@/data/ships';
+import { formatCost } from '@/lib/format';
 
 // Build ship lookups from actual data
 const SHIP_ROLE_MAP = new Map<string, string>();
@@ -15,6 +16,7 @@ SHIPS_DATA.forEach((s) => {
 const ROLES = ['打击', '防御', '辅助', '后勤'] as const;
 const TYPES = ['小型', '中型', '大型', '旗舰'] as const;
 
+/** 行首图例圆点用（完整字面量，类名均以字面量出现在源码中） */
 const ROLE_COLORS: Record<string, string> = {
   '打击': 'from-red-500 to-orange-500',
   '防御': 'from-blue-500 to-cyan-500',
@@ -22,9 +24,48 @@ const ROLE_COLORS: Record<string, string> = {
   '后勤': 'from-emerald-500 to-teal-500',
 };
 
-function formatCost(cost: number): string {
-  if (cost >= 10000) return `${(cost / 10000).toFixed(2)}万 A`;
-  return `${cost.toLocaleString()} A`;
+/**
+ * role 模式单元格渐变——按强度 5 档预写完整字面量类（下标 0 最强）。
+ * 此前用正则对 ROLE_COLORS 运行时改写 alpha（如 from-red-500/80），
+ * Tailwind v4 按源码文本扫描，拼接出的类从未生成，样式静默失效。
+ */
+const ROLE_CELL_CLASSES: Record<string, readonly string[]> = {
+  '打击': [
+    'bg-gradient-to-br from-red-500 to-orange-500 shadow-md',
+    'bg-gradient-to-br from-red-500/80 to-orange-500/70',
+    'bg-gradient-to-br from-red-500/60 to-orange-500/50',
+    'bg-gradient-to-br from-red-500/40 to-orange-500/30',
+    'bg-gradient-to-br from-red-500/20 to-orange-500/15',
+  ],
+  '防御': [
+    'bg-gradient-to-br from-blue-500 to-cyan-500 shadow-md',
+    'bg-gradient-to-br from-blue-500/80 to-cyan-500/70',
+    'bg-gradient-to-br from-blue-500/60 to-cyan-500/50',
+    'bg-gradient-to-br from-blue-500/40 to-cyan-500/30',
+    'bg-gradient-to-br from-blue-500/20 to-cyan-500/15',
+  ],
+  '辅助': [
+    'bg-gradient-to-br from-purple-500 to-violet-500 shadow-md',
+    'bg-gradient-to-br from-purple-500/80 to-violet-500/70',
+    'bg-gradient-to-br from-purple-500/60 to-violet-500/50',
+    'bg-gradient-to-br from-purple-500/40 to-violet-500/30',
+    'bg-gradient-to-br from-purple-500/20 to-violet-500/15',
+  ],
+  '后勤': [
+    'bg-gradient-to-br from-emerald-500 to-teal-500 shadow-md',
+    'bg-gradient-to-br from-emerald-500/80 to-teal-500/70',
+    'bg-gradient-to-br from-emerald-500/60 to-teal-500/50',
+    'bg-gradient-to-br from-emerald-500/40 to-teal-500/30',
+    'bg-gradient-to-br from-emerald-500/20 to-teal-500/15',
+  ],
+};
+
+function getRoleIntensityIndex(intensity: number): number {
+  if (intensity >= 0.8) return 0;
+  if (intensity >= 0.6) return 1;
+  if (intensity >= 0.4) return 2;
+  if (intensity >= 0.2) return 3;
+  return 4;
 }
 
 function getIntensityClass(count: number, maxCount: number): string {
@@ -35,16 +76,6 @@ function getIntensityClass(count: number, maxCount: number): string {
   if (pct >= 0.5) return 'bg-gradient-to-br from-primary/60 to-cyan-400/50';
   if (pct >= 0.3) return 'bg-gradient-to-br from-primary/40 to-cyan-400/30';
   return 'bg-gradient-to-br from-primary/20 to-cyan-400/15';
-}
-
-function getRoleCellClass(count: number, maxCount: number, role: string): string {
-  if (count === 0) return 'bg-muted/10 opacity-30';
-  const pct = count / maxCount;
-  const c = ROLE_COLORS[role] || 'from-primary to-cyan-400';
-  if (pct >= 0.8) return `bg-gradient-to-br ${c} shadow-md`;
-  if (pct >= 0.6) return `bg-gradient-to-br ${c.replace('/80', '').replace('/70', '')}`;
-  if (pct >= 0.4) return `bg-gradient-to-br ${c.replace('from-', 'from-').replace('to-', 'to-')}`;
-  return `bg-gradient-to-br ${c.replace('from-', 'from-').replace('to-', 'to-')}`;
 }
 
 // Build matrix: for each template, count ships by role/type using actual ship data
@@ -194,13 +225,8 @@ export default function FleetHeatmapSection() {
                     if (count === 0) {
                       cellClass = 'bg-muted/10 opacity-30';
                     } else if (viewMode === 'role') {
-                      const intensity = count / maxCount;
-                      const c = ROLE_COLORS[category] || 'from-primary to-cyan-400';
-                      if (intensity >= 0.8) cellClass = `bg-gradient-to-br ${c} shadow-md`;
-                      else if (intensity >= 0.6) cellClass = `bg-gradient-to-br ${c.replace(/(from-[^ ]+)/, '$1/80').replace(/(to-[^ ]+)/, '$1/70')}`;
-                      else if (intensity >= 0.4) cellClass = `bg-gradient-to-br ${c.replace(/(from-[^ ]+)/, '$1/60').replace(/(to-[^ ]+)/, '$1/50')}`;
-                      else if (intensity >= 0.2) cellClass = `bg-gradient-to-br ${c.replace(/(from-[^ ]+)/, '$1/40').replace(/(to-[^ ]+)/, '$1/30')}`;
-                      else cellClass = `bg-gradient-to-br ${c.replace(/(from-[^ ]+)/, '$1/20').replace(/(to-[^ ]+)/, '$1/15')}`;
+                      const tiers = ROLE_CELL_CLASSES[category] ?? ROLE_CELL_CLASSES['打击'];
+                      cellClass = tiers[getRoleIntensityIndex(count / maxCount)];
                     } else {
                       cellClass = getIntensityClass(count, maxCount);
                     }
@@ -222,11 +248,12 @@ export default function FleetHeatmapSection() {
                       >
                         {count > 0 && (
                           <>
-                            <span className="font-mono text-sm font-bold tabular-nums text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+                            {/* 深色模式白字压渐变；浅色模式下低档渐变很淡，改用前景色保证可读 */}
+                            <span className="font-mono text-sm font-bold tabular-nums text-white light:text-foreground drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] light:drop-shadow-none">
                               {count}
                             </span>
                             <div className="mt-0.5">
-                              <span className="text-[9px] font-medium text-white/60">
+                              <span className="text-[9px] font-medium text-white/60 light:text-muted-foreground">
                                 {rowPct}%
                               </span>
                             </div>

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Shield, Swords, Scale, Wrench, ChevronDown, ChevronUp, FileText, Download } from 'lucide-react';
 import { Image } from '@/components/ui/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ClickableCard } from '@/components/ClickableCard';
 import { Badge } from '@/components/ui/badge';
 import { RULES_DATA, type IRule } from '@/data/rules';
 
@@ -84,8 +85,8 @@ export default function RulesSection({ id }: RulesSectionProps) {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.08 }}
               >
-                <Card
-                  className="group cursor-pointer border-border/40 bg-card/60 backdrop-blur-sm hover:border-primary/30 transition-all duration-300"
+                <ClickableCard
+                  className="group border-border/40 bg-card/60 backdrop-blur-sm hover:border-primary/30 transition-all duration-300"
                   onClick={() => toggleRule(rule.id)}
                 >
                   <CardHeader className="pb-3">
@@ -137,7 +138,7 @@ export default function RulesSection({ id }: RulesSectionProps) {
                       </div>
                     </CardContent>
                   </motion.div>
-                </Card>
+                </ClickableCard>
               </motion.div>
             );
           })}

@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   Shield,
@@ -18,81 +17,11 @@ const METRICS = [
   { icon: Crosshair, label: '星际战略特种打击', value: 'STK' },
 ];
 
-function StarfieldCanvas() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let animId = 0;
-    let w = 0;
-    let h = 0;
-
-    const stars: { x: number; y: number; r: number; speed: number; opacity: number }[] = [];
-    for (let i = 0; i < 180; i++) {
-      stars.push({
-        x: Math.random() * 1920,
-        y: Math.random() * 1080,
-        r: Math.random() * 1.6 + 0.3,
-        speed: Math.random() * 0.25 + 0.05,
-        opacity: Math.random() * 0.7 + 0.3,
-      });
-    }
-
-    const resize = () => {
-      w = canvas.parentElement?.clientWidth ?? window.innerWidth;
-      h = canvas.parentElement?.clientHeight ?? window.innerHeight;
-      canvas.width = w;
-      canvas.height = h;
-    };
-
-    const draw = () => {
-      ctx.clearRect(0, 0, w, h);
-      for (const s of stars) {
-        s.y += s.speed;
-        if (s.y > h + 4) {
-          s.y = -4;
-          s.x = Math.random() * w;
-        }
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(180,220,255,${s.opacity})`;
-        ctx.fill();
-      }
-      animId = requestAnimationFrame(draw);
-    };
-
-    resize();
-    draw();
-    window.addEventListener('resize', resize);
-    return () => {
-      cancelAnimationFrame(animId);
-      window.removeEventListener('resize', resize);
-    };
-  }, []);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      className="pointer-events-none absolute inset-0 z-0"
-      aria-hidden="true"
-    />
-  );
-}
-
 export default function HeroSection() {
   return (
-    <section
-      id="hero"
-      className="relative w-full overflow-hidden bg-background py-24 md:py-36"
-    >
-      {/* 星空粒子背景 */}
-      <StarfieldCanvas />
-
+    // 星空由全局 StarfieldBackground（fixed 画布）透出：不再维护局部第二份星空实现，
+    // 因此根节点不做不透明底色。区块锚点 id="hero" 由 WikiHomePage 编排层输出。
+    <section className="relative w-full overflow-hidden py-24 md:py-36">
       {/* 网格线装饰 */}
       <div
         className="pointer-events-none absolute inset-0 z-[1] opacity-[0.06]"
@@ -120,11 +49,10 @@ export default function HeroSection() {
           className="text-center"
         >
           <h1
-            className="text-4xl font-bold tracking-wider md:text-6xl lg:text-7xl"
+            className="text-4xl font-bold tracking-wider text-foreground md:text-6xl lg:text-7xl"
             style={{
               textShadow:
                 '0 0 40px rgba(0,200,255,0.5), 0 0 80px rgba(0,200,255,0.25), 0 0 120px rgba(0,200,255,0.12)',
-              color: '#e0f0ff',
             }}
           >
             星海舰队桌游

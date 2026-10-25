@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Swords, Zap, ChevronRight, Anchor } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { ClickableCard } from '@/components/ClickableCard';
 import { Badge } from '@/components/ui/badge';
-import { FLEET_TEMPLATES_DATA, type IFleetTemplate } from '@/data/fleettemplates';
+import { FLEET_TEMPLATES_DATA } from '@/data/fleettemplates';
+import { formatCost } from '@/lib/format';
 
 const TEMPLATE_ICONS: Record<string, typeof Shield> = {
   '威慑种田舰队': Shield,
@@ -23,18 +25,13 @@ const TEMPLATE_BORDER_COLORS: Record<string, string> = {
   '决战精锐舰队': 'border-violet-500/30 hover:border-violet-400/60',
 };
 
+/** hover 光晕必须是含 hover: 前缀的完整字面量类——Tailwind v4 按源码文本扫描，
+ *  运行时拼 `hover:${glowColor}` 生成的类不存在，样式静默失效 */
 const TEMPLATE_GLOW_COLORS: Record<string, string> = {
-  '威慑种田舰队': 'shadow-cyan-500/15',
-  '均衡备战舰队': 'shadow-amber-500/15',
-  '决战精锐舰队': 'shadow-violet-500/15',
+  '威慑种田舰队': 'hover:shadow-cyan-500/15',
+  '均衡备战舰队': 'hover:shadow-amber-500/15',
+  '决战精锐舰队': 'hover:shadow-violet-500/15',
 };
-
-function formatCost(cost: number): string {
-  if (cost >= 10000) {
-    return `${(cost / 10000).toFixed(2)}万 A`;
-  }
-  return `${cost.toLocaleString()} A`;
-}
 
 export default function TemplatesSection() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -45,8 +42,9 @@ export default function TemplatesSection() {
     setExpandedId((prev) => (prev === id ? null : id));
   };
 
+  // 区块锚点 id="templates" 由 WikiHomePage 编排层输出
   return (
-    <section id="templates" className="w-full py-16 md:py-20">
+    <section className="w-full py-16 md:py-20">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         {/* Section Header */}
         <motion.div
@@ -70,7 +68,7 @@ export default function TemplatesSection() {
             const Icon = TEMPLATE_ICONS[template.name] || Anchor;
             const gradient = TEMPLATE_GRADIENTS[template.name] || 'from-primary/20 via-primary/5 to-transparent';
             const borderColor = TEMPLATE_BORDER_COLORS[template.name] || 'border-primary/30 hover:border-primary/60';
-            const glowColor = TEMPLATE_GLOW_COLORS[template.name] || 'shadow-primary/15';
+            const glowColor = TEMPLATE_GLOW_COLORS[template.name] || 'hover:shadow-primary/15';
             const costRatio = (template.totalCost / maxCost) * 100;
             const isExpanded = expandedId === template.id;
 
@@ -83,8 +81,8 @@ export default function TemplatesSection() {
                 transition={{ duration: 0.5, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
                 whileHover={{ y: -6, transition: { duration: 0.25 } }}
               >
-                <Card
-                  className={`group relative overflow-hidden border bg-card/60 backdrop-blur-sm transition-all duration-300 cursor-pointer ${borderColor} hover:shadow-lg hover:${glowColor}`}
+                <ClickableCard
+                  className={`group relative overflow-hidden border bg-card/60 backdrop-blur-sm transition-all duration-300 ${borderColor} hover:shadow-lg ${glowColor}`}
                   onClick={() => toggleExpand(template.id)}
                 >
                   {/* Gradient overlay */}
@@ -264,7 +262,7 @@ export default function TemplatesSection() {
                       </motion.div>
                     )}
                   </CardContent>
-                </Card>
+                </ClickableCard>
               </motion.div>
             );
           })}

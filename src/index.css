@@ -5,6 +5,10 @@
 @import "./tailwind-theme.css";
 @import "./typography.css";
 
+/* 浅色主题变体：useTheme 在 <html> 上切换 .light 类，注册 light: 前缀供组件做浅色覆盖
+   （Tailwind 默认 dark:/light: 跟随系统 prefers-color-scheme，与本站 class 切换策略不符） */
+@custom-variant light (&:where(.light, .light *));
+
 @layer base {
   h1 { @apply text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight; }
   h2 { @apply text-2xl md:text-3xl font-bold tracking-tight; }

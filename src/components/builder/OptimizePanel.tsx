@@ -3,10 +3,7 @@ import { Sparkles, Wand2 } from 'lucide-react';
 import { SHIPS_DATA } from '@/data/ships';
 import { useFleet } from '@/context/FleetContext';
 import { optimizeFleet, type OptimizeResult } from '@/lib/fleet-math';
-
-function fmt(n: number): string {
-  return n >= 10000 ? `${(n / 10000).toFixed(2)}万A` : `${Math.round(n).toLocaleString()}A`;
-}
+import { formatCost } from '@/lib/format';
 
 /** 一键优化: 输入预算 → 贪心推荐编成（启发式，非全局最优） */
 export function OptimizePanel() {
@@ -69,11 +66,11 @@ export function OptimizePanel() {
               <div className="grid grid-cols-2 gap-1.5 text-xs sm:grid-cols-4">
                 <div className="rounded border border-border/40 px-2 py-1">
                   <span className="text-muted-foreground">总造价</span>
-                  <div className="font-semibold tabular-nums text-foreground">{fmt(result.totals.totalCost)}</div>
+                  <div className="font-semibold tabular-nums text-foreground">{formatCost(result.totals.totalCost)}</div>
                 </div>
                 <div className="rounded border border-border/40 px-2 py-1">
-                  <span className="text-muted-foreground">战力</span>
-                  <div className="font-semibold tabular-nums text-primary">{Math.round(result.totals.totalFP)}</div>
+                  <span className="text-muted-foreground">等效战力{result.auraMultiplier > 1 ? '(含光环)' : ''}</span>
+                  <div className="font-semibold tabular-nums text-primary">{Math.round(result.effectiveFP)}</div>
                 </div>
                 <div className="rounded border border-border/40 px-2 py-1">
                   <span className="text-muted-foreground">ZC占用</span>
@@ -87,6 +84,12 @@ export function OptimizePanel() {
                 </div>
               </div>
 
+              {result.auraApplied.length > 0 && (
+                <p className="text-[11px] text-primary">
+                  光环 ×{result.auraMultiplier.toFixed(2)}：{result.auraApplied.map((a) => `${a.name} +${Math.round(a.bonusPct * 100)}%`).join('、')}
+                </p>
+              )}
+
               <div className="max-h-40 space-y-1 overflow-y-auto rounded-md border border-border/30 p-2">
                 {result.units.map((u) => {
                   const ship = SHIPS_DATA.find((s) => s.id === u.shipId);
@@ -94,7 +97,7 @@ export function OptimizePanel() {
                     <div key={u.shipId} className="flex items-center justify-between text-xs">
                       <span className="text-foreground">{ship?.name ?? u.shipId}</span>
                       <span className="tabular-nums text-muted-foreground">
-                        ×{u.count} · {fmt(u.ship.cost * u.count)}
+                        ×{u.count} · {formatCost(u.ship.cost * u.count)}
                       </span>
                     </div>
                   );

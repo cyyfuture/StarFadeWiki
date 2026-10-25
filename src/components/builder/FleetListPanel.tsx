@@ -3,10 +3,7 @@ import { AlertTriangle, Minus, Plus, Trash2 } from 'lucide-react';
 import { SHIPS_DATA } from '@/data/ships';
 import { useFleet, resolveUnits } from '@/context/FleetContext';
 import { calcFleetTotals, checkCommandCap } from '@/lib/fleet-math';
-
-function fmt(n: number): string {
-  return n >= 10000 ? `${(n / 10000).toFixed(2)}万` : n.toLocaleString('zh-CN', { maximumFractionDigits: 1 });
-}
+import { fmt } from '@/lib/format';
 
 /** 舰队清单 + 六指标统计栏（含超限红字警告） */
 export function FleetListPanel() {

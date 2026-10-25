@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect, memo } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -23,6 +23,7 @@ import { RulesQuickRef } from '@/components/RulesQuickRef';
 import { CommandPalette } from '@/components/CommandPalette';
 
 import { SHIPS_DATA, type IShip } from '@/data/ships';
+import { getShipById, num } from '@/data/ships-access';
 
 const TYPE_ORDER = ['小型', '中型', '大型', '旗舰'] as const;
 const TYPE_ANCHORS: Record<string, string> = {
@@ -43,11 +44,17 @@ export default function WikiHomePage() {
 
   // --- 舰船详情 ---
   const [detailShip, setDetailShip] = useState<IShip | null>(null);
+  const openDetailById = useCallback((id: string) => {
+    setDetailShip(getShipById(id) ?? null);
+  }, []);
+
+  // --- 规则速查（物理 ? 键在 RulesQuickRef 内监听，Header 按钮走同一受控 state） ---
+  const [rulesOpen, setRulesOpen] = useState(false);
 
   // Command Palette 选舰 → 打开详情弹窗
   useEffect(() => {
     const onOpenShip = (e: Event) => {
-      const ship = SHIPS_DATA.find((s) => s.id === (e as CustomEvent<string>).detail);
+      const ship = getShipById((e as CustomEvent<string>).detail);
       if (ship) setDetailShip(ship);
     };
     window.addEventListener('starfade:open-ship', onOpenShip);
@@ -86,7 +93,8 @@ export default function WikiHomePage() {
       );
     }
 
-    const numA = (v: number | string) => (typeof v === 'number' ? v : 0);
+    // FP 排序用数据侧已数值化的 fpNumeric（字符串战力如'自身0/全队+40%输出'有确定数值），
+    // 比值排序用 num()（NaN 安全，'纯辅助'等文案按 0 垫底）
     result.sort((a, b) => {
       switch (shipFilter.sortBy) {
         case 'cost-asc':
@@ -94,13 +102,13 @@ export default function WikiHomePage() {
         case 'cost-desc':
           return b.cost - a.cost;
         case 'fp-asc':
-          return numA(a.regularFP) - numA(b.regularFP);
+          return a.fpNumeric - b.fpNumeric;
         case 'fp-desc':
-          return numA(b.regularFP) - numA(a.regularFP);
+          return b.fpNumeric - a.fpNumeric;
         case 'ratio-asc':
-          return numA(a.regularCostFPRatio) - numA(b.regularCostFPRatio);
+          return num(a.regularCostFPRatio) - num(b.regularCostFPRatio);
         case 'ratio-desc':
-          return numA(b.regularCostFPRatio) - numA(a.regularCostFPRatio);
+          return num(b.regularCostFPRatio) - num(a.regularCostFPRatio);
         case 'maintenance-asc':
           return a.monthlyMaintenance - b.monthlyMaintenance;
         case 'maintenance-desc':
@@ -171,28 +179,12 @@ export default function WikiHomePage() {
   }, []);
 
   const renderShipGrid = (ships: IShip[]) => (
-    <motion.div
-      layout
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-    >
-      {ships.map((ship, i) => (
-        <motion.div
-          key={ship.id}
-          layout
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: (i % 8) * 0.03 }}
-        >
-          <ShipCard
-            ship={ship}
-            selected={selectedShipIds.has(ship.id)}
-            onToggleSelect={() => toggleShipSelection(ship.id)}
-            onClickDetail={() => setDetailShip(ship)}
-          />
-        </motion.div>
-      ))}
-    </motion.div>
+    <ShipGrid
+      ships={ships}
+      selectedIds={selectedShipIds}
+      onToggleSelect={toggleShipSelection}
+      onClickDetail={openDetailById}
+    />
   );
 
   return (
@@ -203,6 +195,7 @@ export default function WikiHomePage() {
         theme={theme}
         onToggleTheme={toggleTheme}
         onSearch={handleSearchFromHeader}
+        onOpenRules={() => setRulesOpen(true)}
       />
 
       <div className="flex">
@@ -248,7 +241,7 @@ export default function WikiHomePage() {
                 </p>
               </motion.div>
 
-              <ShipFilterBar onFilterChange={setShipFilter} />
+              <ShipFilterBar value={shipFilter} onChange={setShipFilter} />
 
               {/* 类型快捷导航 */}
               <motion.div
@@ -420,7 +413,7 @@ export default function WikiHomePage() {
         }}
       />
 
-      <RulesQuickRef />
+      <RulesQuickRef open={rulesOpen} onOpenChange={setRulesOpen} />
 
       <CommandPalette />
 
@@ -435,3 +428,32 @@ export default function WikiHomePage() {
     </div>
   );
 }
+
+interface ShipGridProps {
+  ships: IShip[];
+  selectedIds: ReadonlySet<string>;
+  onToggleSelect: (id: string) => void;
+  onClickDetail: (id: string) => void;
+}
+
+/** 舰船卡片网格：模块级稳定组件，配合 ShipCard memo——勾选对比/开弹窗时仅重渲受影响卡片 */
+const ShipGrid = memo(function ShipGrid({
+  ships,
+  selectedIds,
+  onToggleSelect,
+  onClickDetail,
+}: ShipGridProps) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      {ships.map((ship) => (
+        <ShipCard
+          key={ship.id}
+          ship={ship}
+          selected={selectedIds.has(ship.id)}
+          onToggleSelect={onToggleSelect}
+          onClickDetail={onClickDetail}
+        />
+      ))}
+    </div>
+  );
+});

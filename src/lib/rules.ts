@@ -21,3 +21,13 @@ export const MAINTENANCE_FACILITIES = [
   { level: 3, name: '大型轨道船坞' },
   { level: 4, name: '巨型旗舰船坞' },
 ] as const;
+
+/**
+ * 乘法光环舰: shipId → 全队输出加成（小数）。
+ * 数值出自总册舰船表 regularFP 原文"全队+X%输出"；改规则书数值时只动这里。
+ * 多艘光环叠加按乘法复合（规则书未给出加法叠算口径，取保守乘法）。
+ */
+export const AURA_OUTPUT_BONUS: Readonly<Record<string, number>> = {
+  '6': 0.4, // 补给舰: 自身0/全队+40%输出
+  '26': 0.25, // 督导舰: 30（自身）/全队+25%输出（自身FP已在fpNumeric中计入）
+};

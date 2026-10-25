@@ -19,14 +19,18 @@ export interface IShip {
   coreFeatures: string
   imageUrl: string
 
-  /** 战场指挥容量占用(ZC) = 造价/100。推导依据: fp/cost 排序精确复现规则书"战场打击力效率TOP5" */
+  /** 战场指挥容量占用(ZC) = 造价/100。注意：规则书效率排名（TOP5 等）为编制值，并非由本表 fp/cost 直接推导——实测折跃突击舰 fp/zc 仅列第 8，勿据本表"复现"榜单 */
   zcCost: number
   /** 存在威慑(SZ) = 镇守值。库存×0.6 为编队级效应，由运行时计算 */
   szValue: number
   /** 常规战力数值化: 载机复合取总和(含中队)，辅助光环取自身值；原文仍在 regularFP */
   fpNumeric: number
-  /** 维护等级对应停靠设施名 */
-  maintenanceFacility: string
+  /**
+   * 维护等级对应停靠设施名（死数据：UI 零消费）。展示请用 lib/format.ts 的
+   * maintenanceFacilityName(level)（唯一来源 lib/rules.ts MAINTENANCE_FACILITIES）。
+   * 字段保留为可选仅因 fleet-math.test.ts 类型化夹具引用（该文件受保护不可改）。
+   */
+  maintenanceFacility?: string
 }
 
 export const SHIPS_DATA: IShip[] = [
@@ -52,7 +56,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 1,
     szValue: 4,
     fpNumeric: 10,
-    maintenanceFacility: '前线补给站',
     imageUrl: ''
   },
   {
@@ -76,7 +79,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 1.5,
     szValue: 3,
     fpNumeric: 8,
-    maintenanceFacility: '前线补给站',
     imageUrl: ''
   },
   {
@@ -100,7 +102,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 3,
     szValue: 9,
     fpNumeric: 20,
-    maintenanceFacility: '前线补给站',
     imageUrl: ''
   },
   {
@@ -124,7 +125,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 4.5,
     szValue: 6,
     fpNumeric: 30,
-    maintenanceFacility: '标准行星星港',
     imageUrl: ''
   },
 
@@ -150,7 +150,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 1.8,
     szValue: 8,
     fpNumeric: 25,
-    maintenanceFacility: '前线补给站',
     imageUrl: ''
   },
   {
@@ -174,7 +173,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 2,
     szValue: 2,
     fpNumeric: 0,
-    maintenanceFacility: '前线补给站',
     imageUrl: ''
   },
   {
@@ -198,7 +196,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 2.2,
     szValue: 6,
     fpNumeric: 5,
-    maintenanceFacility: '标准行星星港',
     imageUrl: ''
   },
   {
@@ -222,7 +219,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 2.5,
     szValue: 2,
     fpNumeric: 0,
-    maintenanceFacility: '前线补给站',
     imageUrl: ''
   },
   {
@@ -246,7 +242,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 3,
     szValue: 1,
     fpNumeric: 5,
-    maintenanceFacility: '标准行星星港',
     imageUrl: ''
   },
   {
@@ -270,7 +265,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 3.2,
     szValue: 5,
     fpNumeric: 35,
-    maintenanceFacility: '标准行星星港',
     imageUrl: ''
   },
   {
@@ -294,7 +288,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 3.5,
     szValue: 4,
     fpNumeric: 10,
-    maintenanceFacility: '标准行星星港',
     imageUrl: ''
   },
   {
@@ -318,7 +311,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 3.8,
     szValue: 10,
     fpNumeric: 15,
-    maintenanceFacility: '标准行星星港',
     imageUrl: ''
   },
   {
@@ -342,7 +334,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 4,
     szValue: 3,
     fpNumeric: 40,
-    maintenanceFacility: '标准行星星港',
     imageUrl: ''
   },
   {
@@ -366,7 +357,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 4,
     szValue: 3,
     fpNumeric: 0,
-    maintenanceFacility: '标准行星星港',
     imageUrl: ''
   },
   {
@@ -390,7 +380,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 4.5,
     szValue: 2,
     fpNumeric: 5,
-    maintenanceFacility: '标准行星星港',
     imageUrl: ''
   },
   {
@@ -414,7 +403,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 5,
     szValue: 10,
     fpNumeric: 20,
-    maintenanceFacility: '标准行星星港',
     imageUrl: ''
   },
   {
@@ -438,7 +426,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 5.5,
     szValue: 2,
     fpNumeric: 35,
-    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -462,7 +449,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 6,
     szValue: 1,
     fpNumeric: 25,
-    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -486,7 +472,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 7,
     szValue: 7,
     fpNumeric: 60,
-    maintenanceFacility: '标准行星星港',
     imageUrl: ''
   },
 
@@ -512,7 +497,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 9,
     szValue: 3,
     fpNumeric: 15,
-    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -536,7 +520,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 13,
     szValue: 6,
     fpNumeric: 80,
-    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -560,7 +543,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 16,
     szValue: 4,
     fpNumeric: 20,
-    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -584,7 +566,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 17,
     szValue: 5,
     fpNumeric: 85,
-    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -608,7 +589,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 18,
     szValue: 5,
     fpNumeric: 70,
-    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -632,7 +612,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 20,
     szValue: 4,
     fpNumeric: 90,
-    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -656,7 +635,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 25,
     szValue: 6,
     fpNumeric: 30,
-    maintenanceFacility: '巨型旗舰船坞',
     imageUrl: ''
   },
   {
@@ -680,7 +658,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 32,
     szValue: 5,
     fpNumeric: 100,
-    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -704,7 +681,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 35,
     szValue: 9,
     fpNumeric: 90,
-    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -728,7 +704,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 38,
     szValue: 7,
     fpNumeric: 50,
-    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -752,7 +727,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 42,
     szValue: 3,
     fpNumeric: 95,
-    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -776,7 +750,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 42,
     szValue: 8,
     fpNumeric: 150,
-    maintenanceFacility: '巨型旗舰船坞',
     imageUrl: ''
   },
   {
@@ -800,7 +773,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 48,
     szValue: 10,
     fpNumeric: 60,
-    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
   {
@@ -824,7 +796,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 50,
     szValue: 6,
     fpNumeric: 140,
-    maintenanceFacility: '巨型旗舰船坞',
     imageUrl: ''
   },
   {
@@ -848,7 +819,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 60,
     szValue: 7,
     fpNumeric: 100,
-    maintenanceFacility: '大型轨道船坞',
     imageUrl: ''
   },
 
@@ -874,7 +844,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 80,
     szValue: 5,
     fpNumeric: 40,
-    maintenanceFacility: '巨型旗舰船坞',
     imageUrl: ''
   },
   {
@@ -898,7 +867,6 @@ export const SHIPS_DATA: IShip[] = [
     zcCost: 100,
     szValue: 8,
     fpNumeric: 120,
-    maintenanceFacility: '巨型旗舰船坞',
     imageUrl: ''
   }
 ]

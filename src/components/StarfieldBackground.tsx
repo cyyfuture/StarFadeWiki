@@ -46,6 +46,9 @@ export default function StarfieldBackground() {
       height = window.innerHeight;
       canvas!.width = width;
       canvas!.height = height;
+      // resize 时重建星分布，避免窗口尺寸大幅变化后星星分布失真
+      createStars();
+      if (reducedMotion) renderStatic();
     }
 
     function createStars() {
@@ -185,15 +188,28 @@ export default function StarfieldBackground() {
       animationId = requestAnimationFrame(animate);
     }
 
+    /** prefers-reduced-motion 降级：单帧静态星空（无流星、无 rAF 循环） */
+    function renderStatic() {
+      ctx!.clearRect(0, 0, width, height);
+      for (const star of stars) {
+        drawStar(star, 0);
+      }
+    }
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     resize();
-    createStars();
-    createMeteors();
-    animationId = requestAnimationFrame(animate);
+    if (reducedMotion) {
+      renderStatic();
+    } else {
+      createMeteors();
+      animationId = requestAnimationFrame(animate);
+    }
 
     window.addEventListener('resize', resize);
 
     return () => {
-      cancelAnimationFrame(animationId);
+      if (animationId) cancelAnimationFrame(animationId);
       window.removeEventListener('resize', resize);
     };
   }, []);

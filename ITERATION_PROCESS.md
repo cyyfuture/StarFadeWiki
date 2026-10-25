@@ -123,4 +123,16 @@ done
 
 ---
 
+## 2026-10-25 波次1 修固（同日完成，3 子代理并行 + 主会话引擎/文档）
+
+| 线 | 交付 |
+|----|------|
+| 引擎（主会话） | **光环建模**：optimizeFleet 枚举光环舰子集（补给舰+40%/督导舰+25%，乘法复合）×贪心，新增 effectiveFP/auraMultiplier/auraApplied；OptimizePanel 显示"等效战力(含光环)"，未纳入光环舰以警告披露。AURA_OUTPUT_BONUS 入 rules.ts。测试 13→21 例全绿（含"光环收益低于填充舰时正确拒绝"回归例）；calcTotalDeterrence 补测试（此前零覆盖） |
+| 前端（子代理） | 10 项 P1 全清：筛选状态单一化（Header↔FilterBar 双事实源消除）、重复 DOM id 清零、热力图/模板 Tailwind 动态类改字面量映射表、`lib/format.ts` 统一格式化（四份 MAINTENANCE_LABELS 归一）、ClickableCard 键盘化、浅色主题 token 化、星空合一+reduced-motion、ShipCard memo + ShipGrid 稳定化、规则速查移动端入口（Header BookOpen 按钮）。maintenanceFacility 36 条死数据删除（字段留可选因测试夹具引用）；ships.ts"精确复现TOP5"不实注释修正 |
+| 数据（子代理） | parse-pdf.cjs 修复（pdf-parse v2 两段式 API）；**verify-ships.cjs 校验器**（`npm run verify:data`）：DOCX 主源 36 舰×11 字段逐格比对 + 4 项派生自洽，实测零偏差，--selftest 变异自检、--source=pdf 兜底；rankings.ts 头部溯源注释（编制值声明） |
+| 文档（主会话） | README（门面）/AGENTS（技术规范）/docs/requirements（需求）归位；新增 docs/deploy.md、docs/data-dictionary.md、CHANGELOG.md；RECOVERY_MAP 四处失真修正；PROJECT_STRUCTURE 升 v2.0 |
+| 验收 | typecheck 0 错误；**24/24 测试全绿**；verify:data 36/36；build 三守卫通过 0 污染；eslint 0 error |
+
+---
+
 *本文件随项目迭代持续更新*

@@ -139,8 +139,9 @@ function RankingCard({ category }: { category: IRankingCategory }) {
 }
 
 export default function RankingsSection() {
+  // 区块锚点 id="rankings" 由 WikiHomePage 编排层输出
   return (
-    <section id="rankings" className="w-full py-16 md:py-20">
+    <section className="w-full py-16 md:py-20">
       <div className="mx-auto max-w-7xl px-4 md:px-6">
         {/* 区块标题 */}
         <motion.div
@@ -154,7 +155,7 @@ export default function RankingsSection() {
             核心效率梯队排名
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            基于威慑力、打击力与运营性价比的多维度效率评估
+            基于威慑力、打击力与运营性价比的多维度效率评估（效率值为编制口径，非由舰船数据推导）
           </p>
         </motion.div>
 

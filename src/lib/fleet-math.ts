@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { RULE_CONSTANTS } from './rules';
+import { AURA_OUTPUT_BONUS, RULE_CONSTANTS } from './rules';
 
 /** 构建器舰队单元: 舰船 + 数量 */
 export interface FleetUnitInput {
@@ -75,16 +75,53 @@ export function calcTotalDeterrence(activeSZ: number, stockpileSZ: number): numb
   return activeSZ + stockpileSZ * RULE_CONSTANTS.DETERRENCE_STOCKPILE_FACTOR;
 }
 
+export interface AuraAdoption {
+  shipId: string;
+  name: string;
+  /** 全队输出加成，如 0.4 = +40% */
+  bonusPct: number;
+}
+
 export interface OptimizeResult {
   units: { shipId: string; count: number; ship: FleetUnitInput['ship'] }[];
   totals: FleetTotals;
   warnings: string[];
+  /** 纳入推荐的光环舰（未纳入的以 warnings 披露） */
+  auraApplied: AuraAdoption[];
+  /** 光环乘法总倍率，1 = 无光环 */
+  auraMultiplier: number;
+  /** 计入光环后的全队等效战力 = totals.totalFP × auraMultiplier */
+  effectiveFP: number;
 }
 
+/** 在预算与容量内按"单位ZC战力"降序贪心装填（纯填充，不做光环判断） */
+function greedyFill(
+  sorted: FleetUnitInput['ship'][],
+  budget: number,
+  cap: number
+): { picked: OptimizeResult['units']; remainBudget: number; remainZC: number } {
+  let remainBudget = budget;
+  let remainZC = cap;
+  const picked: OptimizeResult['units'] = [];
+  for (const s of sorted) {
+    if (remainBudget < s.cost || remainZC <= 0) continue;
+    const count = Math.min(Math.floor(remainZC / s.zcCost), Math.floor(remainBudget / s.cost));
+    if (count <= 0) continue;
+    picked.push({ shipId: s.id, count, ship: s });
+    remainBudget -= s.cost * count;
+    remainZC -= s.zcCost * count;
+  }
+  return { picked, remainBudget, remainZC };
+}
+
+const EMPTY_AURA = { auraApplied: [] as AuraAdoption[], auraMultiplier: 1, effectiveFP: 0 };
+
 /**
- * 一键优化（贪心启发式）:
- * 按"单位ZC战力"(fpNumeric/zcCost)降序逐个装入，受预算与指挥上限双重约束；
- * 同分时低月维护优先。非最优解，UI 需明示"启发式推荐"。
+ * 一键优化（贪心启发式 × 光环枚举）:
+ * 枚举光环舰子集（数量少，≤2^k 组合，k 为输入中的光环舰数），
+ * 每个子集扣除其造价/容量后对非光环舰跑一次贪心，取"等效战力 = 基础FP×光环倍率"最高者。
+ * 同分时低总造价、少光环优先。仍非全局最优，UI 需明示"启发式推荐"。
+ * 光环舰不参与贪心填充（避免同一舰既当光环又当填充的重复入选）。
  */
 export function optimizeFleet(
   ships: FleetUnitInput['ship'][],
@@ -93,46 +130,106 @@ export function optimizeFleet(
 ): OptimizeResult {
   const warnings: string[] = [];
   if (!(budget > 0)) {
-    return { units: [], totals: calcFleetTotals([]), warnings: ['预算必须大于 0'] };
+    return { units: [], totals: calcFleetTotals([]), warnings: ['预算必须大于 0'], ...EMPTY_AURA };
   }
   // 过滤不可靠数据
   const usable = ships.filter(
     (s) => Number.isFinite(s.fpNumeric) && s.fpNumeric > 0 && s.zcCost > 0 && s.cost > 0
   );
-  if (usable.length === 0) {
-    return { units: [], totals: calcFleetTotals([]), warnings: ['没有可用的有效数据舰船'] };
+  // 光环舰: fpNumeric 可为 0（如补给舰），但造价/ZC 必须有效
+  const auraShips = ships.filter(
+    (s) => AURA_OUTPUT_BONUS[s.id] !== undefined && s.zcCost > 0 && s.cost > 0
+  );
+  if (usable.length === 0 && auraShips.length === 0) {
+    return { units: [], totals: calcFleetTotals([]), warnings: ['没有可用的有效数据舰船'], ...EMPTY_AURA };
   }
 
-  const sorted = [...usable].sort((a, b) => {
-    const ea = a.fpNumeric / a.zcCost;
-    const eb = b.fpNumeric / b.zcCost;
-    if (eb !== ea) return eb - ea;
-    return a.monthlyMaintenance - b.monthlyMaintenance;
-  });
+  const fillPool = usable
+    .filter((s) => AURA_OUTPUT_BONUS[s.id] === undefined)
+    .sort((a, b) => {
+      const ea = a.fpNumeric / a.zcCost;
+      const eb = b.fpNumeric / b.zcCost;
+      if (eb !== ea) return eb - ea;
+      return a.monthlyMaintenance - b.monthlyMaintenance;
+    });
 
-  let remainBudget = budget;
-  let remainZC = cap;
-  const picked: { shipId: string; count: number; ship: FleetUnitInput['ship'] }[] = [];
-
-  for (const s of sorted) {
-    if (remainBudget < s.cost || remainZC <= 0) continue;
-    const byZC = Math.floor(remainZC / s.zcCost);
-    const byBudget = Math.floor(remainBudget / s.cost);
-    const count = Math.min(byZC, byBudget);
-    if (count <= 0) continue;
-    picked.push({ shipId: s.id, count, ship: s });
-    remainBudget -= s.cost * count;
-    remainZC -= s.zcCost * count;
+  interface Combo {
+    adopted: AuraAdoption[];
+    mult: number;
+    picked: OptimizeResult['units'];
+    /** 基础战力（未乘光环） */
+    baseFP: number;
+    totalCost: number;
+    remainBudget: number;
+    remainZC: number;
+  }
+  const combos: Combo[] = [];
+  const k = auraShips.length;
+  for (let mask = 0; mask < 1 << k; mask++) {
+    const adoptedIdx: number[] = [];
+    let auraCost = 0;
+    let auraZC = 0;
+    let mult = 1;
+    for (let i = 0; i < k; i++) {
+      if (mask & (1 << i)) {
+        const a = auraShips[i];
+        adoptedIdx.push(i);
+        auraCost += a.cost;
+        auraZC += a.zcCost;
+        mult *= 1 + AURA_OUTPUT_BONUS[a.id];
+      }
+    }
+    if (auraCost > budget || auraZC > cap) continue;
+    const { picked, remainBudget, remainZC } = greedyFill(fillPool, budget - auraCost, cap - auraZC);
+    const auraUnits = adoptedIdx.map((i) => ({ shipId: auraShips[i].id, count: 1, ship: auraShips[i] }));
+    const all = [...picked, ...auraUnits];
+    combos.push({
+      adopted: auraUnits.map((u) => ({
+        shipId: u.ship.id,
+        name: u.ship.name,
+        bonusPct: AURA_OUTPUT_BONUS[u.ship.id],
+      })),
+      mult,
+      picked: all,
+      baseFP: all.reduce((s, u) => s + u.ship.fpNumeric * u.count, 0),
+      totalCost: all.reduce((s, u) => s + u.ship.cost * u.count, 0),
+      remainBudget,
+      remainZC,
+    });
   }
 
-  if (remainBudget > budget * 0.05) {
-    warnings.push(`预算剩余 ${Math.round(remainBudget)}A 未花完——可提高大舰占比`);
+  // mask=0（无光环）永远可行，combos 不会为空
+  combos.sort(
+    (a, b) =>
+      b.baseFP * b.mult - a.baseFP * a.mult ||
+      a.totalCost - b.totalCost ||
+      a.adopted.length - b.adopted.length
+  );
+  const best = combos[0];
+  const totals = calcFleetTotals(best.picked.map((p) => ({ ship: p.ship, count: p.count })));
+
+  if (best.remainBudget > budget * 0.05) {
+    warnings.push(`预算剩余 ${Math.round(best.remainBudget)}A 未花完——可提高大舰占比`);
   }
-  if (remainZC >= 1) {
-    warnings.push(`指挥容量剩余 ${Math.round(remainZC)} 点未用满`);
+  if (best.remainZC >= 1) {
+    warnings.push(`指挥容量剩余 ${Math.round(best.remainZC)} 点未用满`);
+  }
+  for (const a of auraShips) {
+    if (!best.adopted.some((x) => x.shipId === a.id)) {
+      warnings.push(
+        `已评估未纳入：${a.name}（全队+${Math.round(AURA_OUTPUT_BONUS[a.id] * 100)}%输出）——预算/容量不足或纳入后总收益不更高`
+      );
+    }
   }
 
-  return { units: picked, totals: calcFleetTotals(picked.map((p) => ({ ship: p.ship, count: p.count }))), warnings };
+  return {
+    units: best.picked,
+    totals,
+    warnings,
+    auraApplied: best.adopted,
+    auraMultiplier: best.mult,
+    effectiveFP: totals.totalFP * best.mult,
+  };
 }
 
 // ---------- 导出 / 导入 ----------

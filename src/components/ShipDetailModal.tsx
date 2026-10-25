@@ -9,6 +9,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Image } from '@/components/ui/image';
+import { formatValue, maintenanceFacilityName } from '@/lib/format';
 import type { IShip } from '@/data/ships';
 
 interface ShipDetailModalProps {
@@ -37,20 +38,6 @@ const ROLE_BADGE_VARIANT: Record<IShip['role'], 'default' | 'secondary' | 'destr
   '辅助': 'secondary',
   '后勤': 'outline',
 };
-
-const MAINTENANCE_LABELS: Record<number, string> = {
-  1: '前线补给站',
-  2: '标准行星星港',
-  3: '大型轨道船坞',
-  4: '巨型旗舰船坞',
-};
-
-function formatValue(v: number | string): string {
-  if (typeof v === 'number') {
-    return Number.isInteger(v) ? v.toString() : v.toFixed(3);
-  }
-  return v;
-}
 
 export default memo(function ShipDetailModal({ ship, open, onOpenChange }: ShipDetailModalProps) {
   if (!ship) return null;
@@ -125,7 +112,7 @@ export default memo(function ShipDetailModal({ ship, open, onOpenChange }: ShipD
                       Lv.{ship.maintenanceLevel}
                     </span>
                     <span className="text-muted-foreground">
-                      {MAINTENANCE_LABELS[ship.maintenanceLevel] || '未知'}
+                      {maintenanceFacilityName(ship.maintenanceLevel)}
                     </span>
                   </span>
                 }

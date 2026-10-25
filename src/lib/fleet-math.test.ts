@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   calcFleetTotals,
+  calcTotalDeterrence,
   checkCommandCap,
   optimizeFleet,
   exportFleet,
@@ -125,6 +126,69 @@ describe('optimizeFleet', () => {
     const r = optimizeFleet([missile], 0, 50);
     expect(r.units.length).toBe(0);
     expect(r.warnings.length).toBeGreaterThan(0);
+  });
+});
+
+describe('calcTotalDeterrence', () => {
+  it('总威慑 = 现役SZ + 库存SZ×0.6', () => {
+    expect(calcTotalDeterrence(50, 10)).toBeCloseTo(56);
+  });
+
+  it('无库存时等于现役SZ', () => {
+    expect(calcTotalDeterrence(50, 0)).toBeCloseTo(50);
+  });
+});
+
+describe('optimizeFleet 光环建模', () => {
+  const missile = mkShip({ id: 'a', name: '导弹巡游舰', cost: 180, fpNumeric: 25, zcCost: 1.8, monthlyMaintenance: 3.5 });
+  // 对齐 ships.ts 真实光环舰: id=6 补给舰(自身0/全队+40%输出), id=26 督导舰(30自身/全队+25%输出)
+  const supply = mkShip({ id: '6', name: '补给舰', role: '后勤', cost: 200, monthlyMaintenance: 3, regularFP: '自身0/全队+40%输出', fpNumeric: 0, zcCost: 2, peakFP: '指数上涨' });
+  const supervisor = mkShip({ id: '26', name: '督导舰', role: '辅助', cost: 2500, monthlyMaintenance: 85, regularFP: '30（自身）/全队+25%输出', fpNumeric: 30, zcCost: 25, maintenanceLevel: 4 });
+
+  it('预算充足时纳入补给舰并按 ×1.4 折算等效战力', () => {
+    const r = optimizeFleet([missile, supply], 10000, 50);
+    const base = r.totals.totalFP;
+    expect(r.units.some((u) => u.shipId === '6')).toBe(true);
+    expect(r.auraApplied.map((a) => a.shipId)).toContain('6');
+    expect(r.auraMultiplier).toBeCloseTo(1.4);
+    expect(r.effectiveFP).toBeCloseTo(base * 1.4);
+  });
+
+  it('预算装不下光环舰时回退无光环并披露未纳入', () => {
+    const r = optimizeFleet([missile, supply], 150, 50);
+    expect(r.units.every((u) => u.shipId !== '6')).toBe(true);
+    expect(r.auraMultiplier).toBe(1);
+    expect(r.warnings.some((w) => w.includes('补给舰'))).toBe(true);
+  });
+
+  it('督导舰自身30FP计入基础战力，光环作用于全队', () => {
+    // 大容量场景: 基础FP足够大时，督导舰 25ZC 换 +25% 全队输出才优于换导弹填充
+    const r = optimizeFleet([missile, supervisor], 500000, 200);
+    const supervisorUnit = r.units.find((u) => u.shipId === '26');
+    expect(supervisorUnit).toBeDefined();
+    expect(supervisorUnit?.count).toBe(1); // 光环舰不作为填充重复入选
+    expect(r.auraMultiplier).toBeCloseTo(1.25);
+    expect(r.effectiveFP).toBeCloseTo(r.totals.totalFP * 1.25);
+    expect(r.totals.totalFP).toBeGreaterThanOrEqual(30); // 自身FP在基础值中
+  });
+
+  it('两艘光环舰按乘法复合 ×1.75', () => {
+    const r = optimizeFleet([missile, supply, supervisor], 500000, 200);
+    expect(r.auraMultiplier).toBeCloseTo(1.4 * 1.25);
+    expect(r.effectiveFP).toBeCloseTo(r.totals.totalFP * 1.75);
+  });
+
+  it('光环收益低于填充舰时正确拒绝（督导舰在小容量下被导弹压制）', () => {
+    const r = optimizeFleet([missile, supervisor], 50000, 50);
+    expect(r.auraMultiplier).toBe(1);
+    expect(r.warnings.some((w) => w.includes('督导舰'))).toBe(true);
+  });
+
+  it('输入不含光环舰时行为与旧版一致（倍率1）', () => {
+    const r = optimizeFleet([missile], 5000, 50);
+    expect(r.auraMultiplier).toBe(1);
+    expect(r.auraApplied).toHaveLength(0);
+    expect(r.effectiveFP).toBeCloseTo(r.totals.totalFP);
   });
 });
 

@@ -13,6 +13,7 @@
     "prepare": "node scripts/setup-git-hooks.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
+    "verify:data": "node scripts/verify-ships.cjs",
     "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {

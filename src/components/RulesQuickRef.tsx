@@ -1,13 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { BookOpen } from 'lucide-react';
 import { RULES_DATA } from '@/data/rules';
 import { MAINTENANCE_FACILITIES, RULE_CONSTANTS } from '@/lib/rules';
 
-/** 全局规则速查: 任意位置按 ? 呼出（输入框聚焦时除外），Esc 关闭 */
-export function RulesQuickRef() {
-  const [open, setOpen] = useState(false);
+interface RulesQuickRefProps {
+  /** 受控开关：open state 由调用方（WikiHomePage）持有——Header 的规则速查按钮与物理 ? 键共用同一 Dialog */
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
 
+/** 全局规则速查: 任意位置按 ? 呼出（输入框聚焦时除外），Esc 或 Header 图标按钮关闭 */
+export function RulesQuickRef({ open, onOpenChange }: RulesQuickRefProps) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
@@ -18,15 +22,15 @@ export function RulesQuickRef() {
       // 主键盘 ? (Shift+/) 与数字小键盘均可能触发; e.key === '?' 已覆盖 Shift+/
       if (e.key === '?') {
         e.preventDefault();
-        setOpen((v) => !v);
+        onOpenChange(!open);
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  }, [open, onOpenChange]);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[85vh] max-w-lg overflow-y-auto border-border/60 bg-card">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-foreground">
@@ -82,6 +86,7 @@ export function RulesQuickRef() {
                 </tr>
               </tbody>
             </table>
+            {/* eslint-disable-next-line no-restricted-syntax -- 静态资源直链下载，非路由跳转 */}
             <a
               href="/rulebook.pdf"
               download
