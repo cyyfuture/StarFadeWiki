@@ -7,6 +7,10 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 # path and build output lands in a stray C:\c\... directory while the script exits 0.
 case "$(uname -s)" in
   MINGW*|MSYS*|CYGWIN*)
+    # 禁用 MSYS 的两类路径转换，否则以 / 开头的变量值（如 ASSETS_CDN_PATH=/）
+    # 传给 node.exe 时会被改写成 Git 安装根（C:/Program Files/Git），产物资源引用全部失效
+    export MSYS_NO_PATHCONV=1
+    export MSYS2_ENV_CONV_EXCL='*'
     if command -v cygpath >/dev/null 2>&1; then
       ROOT="$(cygpath -m "$ROOT")"
     else
@@ -80,6 +84,23 @@ if [ ! -s "$OUTPUT/index.html" ]; then
   echo "  (hint: check that vite build wrote to $ROOT/dist/client)" >&2
   exit 1
 fi
+
+# Guard: index.html must not contain MSYS-mangled paths (Git Bash maps / → C:/Program Files/Git)
+if grep -q 'Program Files' "$OUTPUT/index.html"; then
+  echo "FATAL: dist/output/index.html contains MSYS-mangled asset paths" >&2
+  echo "  (hint: a '/'-prefixed variable was rewritten by Git Bash path conversion)" >&2
+  exit 1
+fi
+
+# Guard: every assets/ reference in index.html must exist in the merged output
+BUILD_GUARD_MISSING=0
+for BUILD_GUARD_REF in $(grep -o 'assets/[^"]*' "$OUTPUT/index.html" | sort -u); do
+  if [ ! -f "$OUTPUT/$BUILD_GUARD_REF" ]; then
+    echo "FATAL: index.html references missing asset: $BUILD_GUARD_REF" >&2
+    BUILD_GUARD_MISSING=1
+  fi
+done
+[ "$BUILD_GUARD_MISSING" -eq 0 ] || exit 1
 
 echo "Build complete"
 echo "  All output → dist/output/"

@@ -12,7 +12,8 @@
     "precommit": "npm run lint",
     "prepare": "node scripts/setup-git-hooks.mjs",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
     "@formkit/auto-animate": "^0.9.0",
@@ -82,6 +83,7 @@
     "pdf-parse": "^2.4.5",
     "typescript": "~5.9",
     "vite": "^8",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.11",
+    "wrangler": "^4.152.0"
   }
 }
